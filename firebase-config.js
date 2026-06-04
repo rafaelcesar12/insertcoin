@@ -9,12 +9,12 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-aut
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_PROJETO.firebaseapp.com",
-  projectId: "SEU_PROJETO_ID",
-  storageBucket: "SEU_PROJETO.appspot.com",
-  messagingSenderId: "SEU_MESSAGING_ID",
-  appId: "SEU_APP_ID"
+  apiKey: "AIzaSyCNDgP0z8hUi1w47tVxkUKMD0Hxq2Psnaw",
+  authDomain: "insert-coin-fa696.firebaseapp.com",
+  projectId: "insert-coin-fa696",
+  storageBucket: "insert-coin-fa696.firebasestorage.app",
+  messagingSenderId: "424921539456",
+  appId: "1:424921539456:web:fd55f457fad4ffe3d39765"
 };
 
 const app = initializeApp(firebaseConfig);
