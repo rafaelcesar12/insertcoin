@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Insert Coin — Perfil</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
+  <style>
+    body { background: var(--bg); min-height: 100vh; }
+    .bg-grid {
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(123,44,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(123,44,255,0.025) 1px, transparent 1px);
+      background-size: 50px 50px; pointer-events: none;
+    }
+
+    /* Topbar */
+    .topbar {
+      position:sticky;top:0;z-index:100;
+      background: rgba(5,5,16,0.92);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      padding: 0 20px; height: 56px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .topbar-logo { font-family:var(--font-head); font-size:16px; font-weight:900; letter-spacing:0.1em; color:var(--neon-green); text-shadow:var(--glow-green); }
+    .topbar-nav { display:flex; gap:8px; }
+
+    /* Profile layout */
+    .profile-wrap {
+      max-width: 800px; margin: 0 auto;
+      padding: 24px 20px 60px;
+      display: flex; flex-direction: column; gap: 20px;
+      position: relative; z-index: 1;
+    }
+
+    /* Banner */
+    .profile-banner {
+      height: 160px; border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, #0d0230 0%, #0a0b1e 30%, #050a2a 60%, #0d0230 100%);
+      position: relative; overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .profile-banner::before {
+      content: "";
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(123,44,255,0.2), rgba(0,224,255,0.1), rgba(0,255,200,0.15));
+    }
+    .banner-pattern {
+      position: absolute; inset: 0; opacity: 0.08;
+      background-image: repeating-linear-gradient(45deg, var(--neon-purple) 0px, var(--neon-purple) 1px, transparent 1px, transparent 20px);
+    }
+
+    /* Profile card */
+    .profile-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-top: -50px;
+      position: relative;
+    }
+    .profile-top {
+      display: flex; align-items: flex-end; gap: 16px; margin-bottom: 16px;
+    }
+    .profile-avatar {
+      width: 80px; height: 80px; border-radius: 50%;
+      border: 3px solid var(--neon-green);
+      box-shadow: var(--glow-green);
+      background: var(--bg-card2);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-head); font-size: 28px; color: var(--neon-green);
+      flex-shrink: 0; overflow: hidden;
+    }
+    .profile-info-main { flex: 1; padding-bottom: 4px; }
+    .profile-nick { font-family: var(--font-head); font-size: 20px; font-weight: 900; color: var(--text); margin-bottom: 6px; }
+    .profile-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .profile-email { font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); }
+
+    /* XP / Level section */
+    .level-section {
+      display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center;
+      padding: 14px; background: var(--bg-card2); border-radius: var(--radius); margin-bottom: 16px;
+    }
+    .level-badge {
+      text-align: center;
+      background: linear-gradient(135deg, rgba(123,44,255,0.2), rgba(0,224,255,0.1));
+      border: 1px solid rgba(123,44,255,0.3);
+      border-radius: var(--radius);
+      padding: 8px 14px;
+      min-width: 70px;
+    }
+    .level-num { font-family: var(--font-head); font-size: 24px; font-weight: 900; color: var(--neon-purple); text-shadow: var(--glow-purple); }
+    .level-lbl { font-family: var(--font-mono); font-size: 9px; color: var(--text-muted); letter-spacing: 0.1em; }
+    .xp-section-label { display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-bottom:6px; font-family:var(--font-mono); }
+
+    /* Bio section */
+    .section-title { font-family: var(--font-head); font-size: 11px; letter-spacing: 0.12em; color: var(--text-muted); margin-bottom: 10px; }
+
+    /* Edit form */
+    .edit-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+    .edit-section h3 {
+      font-family: var(--font-head); font-size: 13px; letter-spacing: 0.1em;
+      color: var(--neon-green); margin-bottom: 20px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .edit-section h3::before { content: "//"; color: var(--text-muted); }
+    .edit-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 540px) { .edit-row { grid-template-columns: 1fr; } }
+
+    .platform-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 6px; margin-top: 6px; }
+    .platform-btn {
+      background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 8px 4px; text-align: center; cursor: pointer; transition: all var(--transition);
+      color: var(--text-muted); font-size: 10px; font-family: var(--font-head);
+    }
+    .platform-btn .p-icon { font-size: 18px; display: block; margin-bottom: 3px; }
+    .platform-btn:hover, .platform-btn.selected {
+      border-color: var(--neon-purple); background: rgba(123,44,255,0.12);
+      color: var(--neon-purple); box-shadow: 0 0 10px rgba(123,44,255,0.25);
+    }
+
+    .games-tags { display:flex; flex-wrap:wrap; gap:6px; min-height:28px; margin-top:8px; }
+    .game-tag .remove-tag { cursor:pointer; margin-left:3px; }
+    .game-tag .remove-tag:hover { color: #ff3355; }
+
+    /* Success/error msg */
+    .save-msg { font-size:13px; text-align:center; margin-top:10px; display:none; }
+    .save-msg.ok { color: var(--neon-green); }
+    .save-msg.err { color: #ff3355; }
+
+    /* Loading */
+    .page-loading { display:flex; justify-content:center; padding:60px; }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+
+  <header class="topbar">
+    <div class="topbar-logo">🎮 INSERT COIN</div>
+    <div class="topbar-nav">
+      <a class="btn btn-ghost" href="home.html" style="padding:6px 14px;font-size:10px;">← FEED</a>
+      <button class="btn btn-danger" id="btn-logout" style="padding:6px 14px;font-size:10px;">SAIR</button>
+    </div>
+  </header>
+
+  <div id="page-loading" class="page-loading"><div class="spinner"></div></div>
+
+  <div class="profile-wrap" id="profile-wrap" style="display:none">
+    <!-- Banner -->
+    <div class="profile-banner">
+      <div class="banner-pattern"></div>
+    </div>
+
+    <!-- Profile info card -->
+    <div class="profile-card">
+      <div class="profile-top">
+        <div class="profile-avatar" id="p-avatar">?</div>
+        <div class="profile-info-main">
+          <div class="profile-nick" id="p-nick">...</div>
+          <div class="profile-meta">
+            <span class="platform-badge" id="p-platform">...</span>
+            <span class="profile-email" id="p-email"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Level & XP -->
+      <div class="level-section">
+        <div class="level-badge">
+          <div class="level-num" id="p-level">1</div>
+          <div class="level-lbl">NÍVEL</div>
+        </div>
+        <div style="flex:1">
+          <div class="xp-section-label">
+            <span>Progresso XP</span>
+            <span><span id="p-xp">0</span> / <span id="p-xp-next">100</span></span>
+          </div>
+          <div class="xp-bar-wrap">
+            <div class="xp-bar-fill" id="p-xp-bar" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bio -->
+      <div class="section-title">BIO</div>
+      <p id="p-bio" style="font-size:14px;color:var(--text-muted);min-height:20px;">...</p>
+
+      <hr class="neon-divider" />
+
+      <!-- Favorite games -->
+      <div class="section-title">JOGOS FAVORITOS</div>
+      <div class="games-tags" id="p-games"></div>
+    </div>
+
+    <!-- Edit form -->
+    <div class="edit-section">
+      <h3>EDITAR PERFIL</h3>
+
+      <div class="edit-row">
+        <div class="form-group">
+          <label for="e-nick">Nickname</label>
+          <input type="text" id="e-nick" maxlength="20" />
+        </div>
+        <div class="form-group">
+          <label for="e-bio">Bio</label>
+          <input type="text" id="e-bio" maxlength="120" placeholder="Fale sobre você..." />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Plataforma Principal</label>
+        <div class="platform-grid">
+          <div class="platform-btn" data-platform="PC"><span class="p-icon">🖥️</span>PC</div>
+          <div class="platform-btn" data-platform="PlayStation"><span class="p-icon">🎮</span>PS</div>
+          <div class="platform-btn" data-platform="Xbox"><span class="p-icon">🟩</span>Xbox</div>
+          <div class="platform-btn" data-platform="Nintendo"><span class="p-icon">🔴</span>Switch</div>
+          <div class="platform-btn" data-platform="Mobile"><span class="p-icon">📱</span>Mobile</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Jogos Favoritos</label>
+        <input type="text" id="e-game-input" placeholder="Digite e pressione Enter (máx. 8)" />
+        <div class="games-tags" id="e-games-tags"></div>
+      </div>
+
+      <div class="edit-row" style="margin-top:4px">
+        <div class="form-group">
+          <label for="e-discord">Discord</label>
+          <input type="text" id="e-discord" placeholder="user#1234" />
+        </div>
+        <div class="form-group">
+          <label for="e-steam">Steam</label>
+          <input type="text" id="e-steam" placeholder="Perfil Steam" />
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="btn-save" style="width:100%;padding:13px;margin-top:8px;">
+        <span id="save-text">💾 SALVAR ALTERAÇÕES</span>
+        <div class="spinner" id="save-spinner" style="display:none"></div>
+      </button>
+      <div class="save-msg" id="save-msg"></div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+  <script type="module" src="profile.js"></script>
+</body>
+</html>

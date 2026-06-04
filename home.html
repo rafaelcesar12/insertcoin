@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Insert Coin — Home</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
+  <style>
+    /* ── LAYOUT ─────────────────────────── */
+    body { background: var(--bg); }
+
+    .bg-grid {
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,224,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,224,255,0.025) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    /* ── TOP BAR ─────────────────────────── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(5,5,16,0.92);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      padding: 0 20px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .topbar-logo {
+      font-family: var(--font-head);
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      color: var(--neon-green);
+      text-shadow: var(--glow-green);
+      white-space: nowrap;
+    }
+    .topbar-welcome {
+      font-size: 13px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .topbar-welcome strong { color: var(--neon-green); font-family: var(--font-head); font-size: 12px; }
+    .topbar-right {
+      display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+    }
+    .topbar-date {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    /* ── SHELL ───────────────────────────── */
+    .shell {
+      display: grid;
+      grid-template-columns: 220px 1fr 240px;
+      gap: 0;
+      min-height: calc(100vh - 56px);
+      max-width: 1300px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* ── SIDEBAR LEFT ────────────────────── */
+    .sidebar-left {
+      padding: 20px 12px;
+      border-right: 1px solid var(--border);
+      position: sticky;
+      top: 56px;
+      height: calc(100vh - 56px);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all var(--transition);
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-family: var(--font-head);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-decoration: none;
+      user-select: none;
+    }
+    .nav-item .nav-icon { font-size: 16px; flex-shrink: 0; width: 20px; text-align: center; }
+    .nav-item:hover {
+      background: rgba(0,255,200,0.06);
+      border-color: rgba(0,255,200,0.15);
+      color: var(--neon-green);
+    }
+    .nav-item.active {
+      background: rgba(0,255,200,0.08);
+      border-color: rgba(0,255,200,0.25);
+      color: var(--neon-green);
+    }
+    .nav-item.coming-soon { opacity: 0.4; cursor: default; }
+    .nav-item.coming-soon:hover { background: none; border-color: transparent; color: var(--text-muted); }
+    .coming-pill {
+      margin-left: auto;
+      background: rgba(123,44,255,0.2);
+      border: 1px solid rgba(123,44,255,0.3);
+      border-radius: 100px;
+      padding: 1px 6px;
+      font-size: 9px;
+      color: var(--neon-purple);
+      letter-spacing: 0.05em;
+    }
+
+    .sidebar-user-card {
+      margin-top: auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+    }
+    .sidebar-user-card .user-info {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+    }
+    .sidebar-user-card .nickname {
+      font-family: var(--font-head); font-size: 12px; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .sidebar-user-card .level-txt {
+      font-size: 11px; color: var(--text-muted);
+    }
+    .xp-label { display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); margin-bottom:4px; font-family:var(--font-mono); }
+
+    /* ── MAIN FEED ───────────────────────── */
+    .main {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* New post composer */
+    .composer {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+    }
+    .composer-top {
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .composer textarea {
+      flex: 1; background: var(--bg-input); border: 1px solid var(--border);
+      border-radius: var(--radius); color: var(--text); font-family: var(--font-body);
+      font-size: 14px; padding: 10px 12px; resize: none; min-height: 72px;
+      transition: border-color var(--transition);
+    }
+    .composer textarea:focus { border-color: var(--neon-green); outline: none; }
+    .composer-bottom {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 10px; padding-left: 52px;
+    }
+    .composer-bottom input {
+      width: 160px; font-size: 12px; padding: 6px 10px;
+    }
+
+    /* Post card */
+    .post-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      transition: border-color var(--transition);
+    }
+    .post-card:hover { border-color: rgba(0,255,200,0.15); }
+    .post-header {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+    }
+    .post-author {
+      font-family: var(--font-head); font-size: 12px; color: var(--neon-green);
+    }
+    .post-time {
+      font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); margin-left: auto;
+    }
+    .post-content {
+      font-size: 14px; line-height: 1.6; color: var(--text); margin-bottom: 12px;
+      white-space: pre-wrap;
+    }
+    .post-actions {
+      display: flex; align-items: center; gap: 12px; padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .post-action-btn {
+      display: flex; align-items: center; gap: 5px;
+      background: none; border: none; cursor: pointer;
+      color: var(--text-muted); font-size: 12px;
+      font-family: var(--font-head); letter-spacing: 0.05em;
+      transition: color var(--transition); padding: 4px 8px;
+      border-radius: 6px;
+    }
+    .post-action-btn:hover { color: var(--neon-green); background: rgba(0,255,200,0.06); }
+    .post-action-btn.liked { color: var(--neon-pink); }
+
+    /* Feed header */
+    .feed-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;
+    }
+    .feed-header h2 {
+      font-family: var(--font-head); font-size: 13px; letter-spacing: 0.1em; color: var(--text);
+    }
+
+    .feed-empty {
+      text-align: center; padding: 40px 20px; color: var(--text-muted);
+    }
+    .feed-empty .empty-icon { font-size: 40px; margin-bottom: 12px; }
+    .feed-empty p { font-size: 14px; }
+
+    .feed-loading {
+      display: flex; justify-content: center; padding: 30px;
+    }
+
+    /* ── SIDEBAR RIGHT ───────────────────── */
+    .sidebar-right {
+      padding: 20px 12px;
+      border-left: 1px solid var(--border);
+      position: sticky;
+      top: 56px;
+      height: calc(100vh - 56px);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .widget-title {
+      font-family: var(--font-head); font-size: 10px; letter-spacing: 0.15em;
+      color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .widget-title::after {
+      content: ""; flex: 1; height: 1px;
+      background: linear-gradient(90deg, var(--neon-green), transparent);
+      opacity: 0.3;
+    }
+
+    .online-user {
+      display: flex; align-items: center; gap: 8px; padding: 8px;
+      border-radius: var(--radius); transition: background var(--transition);
+      cursor: pointer;
+    }
+    .online-user:hover { background: rgba(0,255,200,0.05); }
+    .online-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--neon-green); box-shadow: 0 0 6px var(--neon-green);
+      flex-shrink: 0; margin-left: auto;
+    }
+    .online-nick { font-family: var(--font-head); font-size: 11px; color: var(--text); }
+    .online-game { font-size: 11px; color: var(--text-muted); }
+
+    .squad-card {
+      background: var(--bg-card2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 10px; cursor: pointer;
+      transition: border-color var(--transition);
+    }
+    .squad-card:hover { border-color: var(--neon-purple); }
+    .squad-name { font-family: var(--font-head); font-size: 11px; color: var(--neon-purple); margin-bottom: 4px; }
+    .squad-meta { font-size: 11px; color: var(--text-muted); }
+
+    /* ── MOBILE NAV ──────────────────────── */
+    .mobile-nav {
+      display: none;
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+      background: rgba(5,5,16,0.96);
+      border-top: 1px solid var(--border);
+      padding: 8px 4px;
+      justify-content: space-around;
+    }
+    .mob-nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      font-family: var(--font-head); font-size: 8px; letter-spacing: 0.05em;
+      color: var(--text-muted); cursor: pointer; padding: 4px 8px;
+      border-radius: 8px; transition: color var(--transition);
+    }
+    .mob-nav-item .mni { font-size: 18px; }
+    .mob-nav-item.active, .mob-nav-item:hover { color: var(--neon-green); }
+
+    /* ── RESPONSIVE ──────────────────────── */
+    @media (max-width: 1024px) {
+      .shell { grid-template-columns: 64px 1fr 0; }
+      .sidebar-right { display: none; }
+      .nav-item span { display: none; }
+      .nav-item .coming-pill { display: none; }
+      .nav-item { justify-content: center; padding: 10px; }
+      .sidebar-user-card { display: none; }
+    }
+    @media (max-width: 640px) {
+      .shell { grid-template-columns: 1fr; }
+      .sidebar-left { display: none; }
+      .mobile-nav { display: flex; }
+      body { padding-bottom: 70px; }
+      .topbar-date { display: none; }
+      .topbar-welcome { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-logo">🎮 INSERT COIN</div>
+    <div class="topbar-welcome hide-mobile">
+      Bem-vindo, <strong id="top-nick">...</strong>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-date" id="top-date"></div>
+      <button class="btn btn-danger" id="btn-logout" style="padding:6px 14px;font-size:10px;">SAIR</button>
+    </div>
+  </header>
+
+  <div class="shell">
+    <!-- SIDEBAR LEFT — MENU -->
+    <aside class="sidebar-left">
+      <a class="nav-item active" href="home.html">
+        <span class="nav-icon">📡</span><span>Feed</span>
+      </a>
+      <a class="nav-item" href="profile.html">
+        <span class="nav-icon">👤</span><span>Meu Perfil</span>
+      </a>
+      <a class="nav-item coming-soon" href="#">
+        <span class="nav-icon">👥</span><span>Amigos</span><span class="coming-pill">EM BREVE</span>
+      </a>
+      <a class="nav-item coming-soon" href="#">
+        <span class="nav-icon">🛡️</span><span>Squads</span><span class="coming-pill">EM BREVE</span>
+      </a>
+      <a class="nav-item coming-soon" href="#">
+        <span class="nav-icon">🏆</span><span>Eventos & eSports</span><span class="coming-pill">EM BREVE</span>
+      </a>
+      <a class="nav-item coming-soon" href="#">
+        <span class="nav-icon">🎮</span><span>Biblioteca</span><span class="coming-pill">EM BREVE</span>
+      </a>
+      <a class="nav-item" href="profile.html">
+        <span class="nav-icon">⚙️</span><span>Configurações</span>
+      </a>
+
+      <!-- User mini card -->
+      <div class="sidebar-user-card" id="sidebar-user">
+        <div class="user-info">
+          <div class="avatar" id="side-avatar">?</div>
+          <div>
+            <div class="nickname" id="side-nick">...</div>
+            <div class="level-txt">Nível <span id="side-level">1</span></div>
+          </div>
+        </div>
+        <div class="xp-label">
+          <span>XP</span><span id="side-xp">0</span>
+        </div>
+        <div class="xp-bar-wrap">
+          <div class="xp-bar-fill" id="side-xp-bar" style="width:0%"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN FEED -->
+    <main class="main">
+      <!-- Ad banner top -->
+      <div class="ad-block">
+        📢 ESPAÇO PARA ANÚNCIO — PERIFÉRICOS / JOGOS / PATROCINADORES
+      </div>
+
+      <!-- Composer -->
+      <div class="composer" id="composer">
+        <div class="composer-top">
+          <div class="avatar" id="comp-avatar">?</div>
+          <textarea id="post-content" placeholder="No que você está jogando? Compartilhe com a arena..."></textarea>
+        </div>
+        <div class="composer-bottom">
+          <input type="text" id="post-tag" placeholder="# tag do jogo (ex: CS2)" style="width:160px;font-size:12px;padding:6px 10px;" />
+          <button class="btn btn-primary" id="btn-post" style="padding:8px 20px;font-size:11px;">
+            <span id="post-text">📡 POSTAR</span>
+            <div class="spinner" id="post-spinner" style="display:none"></div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Feed -->
+      <div class="feed-header">
+        <h2>🌐 FEED DA ARENA</h2>
+        <button class="btn btn-ghost" id="btn-refresh" style="padding:6px 12px;font-size:10px;">↻ ATUALIZAR</button>
+      </div>
+
+      <div id="feed-loading" class="feed-loading">
+        <div class="spinner"></div>
+      </div>
+      <div id="feed-container"></div>
+    </main>
+
+    <!-- SIDEBAR RIGHT -->
+    <aside class="sidebar-right">
+      <!-- Ad -->
+      <div class="ad-block">
+        🎮 ANÚNCIO<br>
+        <span style="font-size:9px;opacity:0.6">728×90 Banner</span>
+      </div>
+
+      <!-- Players online (demo) -->
+      <div>
+        <div class="widget-title">Players Online</div>
+        <div id="online-list">
+          <div class="online-user">
+            <div class="avatar" style="width:30px;height:30px;font-size:12px;">N</div>
+            <div>
+              <div class="online-nick">N3oPlayer</div>
+              <div class="online-game">CS2</div>
+            </div>
+            <div class="online-dot"></div>
+          </div>
+          <div class="online-user">
+            <div class="avatar" style="width:30px;height:30px;font-size:12px;">X</div>
+            <div>
+              <div class="online-nick">xVenom</div>
+              <div class="online-game">Valorant</div>
+            </div>
+            <div class="online-dot"></div>
+          </div>
+          <div class="online-user">
+            <div class="avatar" style="width:30px;height:30px;font-size:12px;">D</div>
+            <div>
+              <div class="online-nick">D4rkStar</div>
+              <div class="online-game">Apex Legends</div>
+            </div>
+            <div class="online-dot"></div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="neon-divider" />
+
+      <!-- Open squads -->
+      <div>
+        <div class="widget-title">Squads Abertos</div>
+        <div style="display:flex;flex-direction:column;gap:8px;" id="squads-widget">
+          <div class="squad-card">
+            <div class="squad-name">🛡️ RUSH B CREW</div>
+            <div class="squad-meta">CS2 · PC · 3/5 vagas</div>
+          </div>
+          <div class="squad-card">
+            <div class="squad-name">⚡ APEX HUNTERS</div>
+            <div class="squad-meta">Apex Legends · PC · 2/3 vagas</div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="neon-divider" />
+
+      <!-- Suggested players -->
+      <div>
+        <div class="widget-title">Jogadores Sugeridos</div>
+        <div id="suggested-players"></div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="mobile-nav">
+    <div class="mob-nav-item active"><span class="mni">📡</span>Feed</div>
+    <div class="mob-nav-item" onclick="location.href='profile.html'"><span class="mni">👤</span>Perfil</div>
+    <div class="mob-nav-item"><span class="mni">🛡️</span>Squads</div>
+    <div class="mob-nav-item"><span class="mni">🏆</span>Eventos</div>
+    <div class="mob-nav-item"><span class="mni">⚙️</span>Config</div>
+  </nav>
+
+  <div id="toast-container"></div>
+
+  <script type="module" src="home.js"></script>
+</body>
+</html>

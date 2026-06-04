@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Insert Coin — Criar Conta</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
+  <style>
+    body {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+      background: var(--bg);
+    }
+    .bg-grid {
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(123,44,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(123,44,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      animation: gridMove 25s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes gridMove {
+      from { background-position: 0 0, 0 0; }
+      to   { background-position: 40px 40px, 40px 40px; }
+    }
+    .orb { position:fixed; border-radius:50%; filter:blur(80px); pointer-events:none; opacity:0.3; }
+    .orb-1 { width:350px;height:350px;background:var(--neon-green);top:-5%;right:-5%; }
+    .orb-2 { width:300px;height:300px;background:var(--neon-purple);bottom:-5%;left:-5%; }
+
+    .auth-wrap {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 480px;
+    }
+    .logo { text-align:center; margin-bottom:28px; }
+    .logo-name { font-family:var(--font-head); font-size:22px; font-weight:900; letter-spacing:0.12em; color:var(--neon-green); text-shadow:var(--glow-green); }
+    .back-link { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-family:var(--font-head); letter-spacing:0.08em; margin-bottom:8px; }
+
+    .auth-card {
+      background: rgba(10, 11, 30, 0.92);
+      border: 1px solid rgba(123,44,255,0.25);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      backdrop-filter: blur(12px);
+      position: relative;
+    }
+    .pixel-corner { position:absolute; width:16px; height:16px; border-color:var(--neon-purple); border-style:solid; opacity:0.5; }
+    .pc-tl { top:0;left:0;border-width:2px 0 0 2px; }
+    .pc-tr { top:0;right:0;border-width:2px 2px 0 0; }
+    .pc-bl { bottom:0;left:0;border-width:0 0 2px 2px; }
+    .pc-br { bottom:0;right:0;border-width:0 2px 2px 0; }
+
+    .auth-card h2 {
+      font-family:var(--font-head); font-size:15px; font-weight:700;
+      letter-spacing:0.1em; color:var(--text); margin-bottom:24px; text-align:center;
+    }
+    .step-indicator {
+      display:flex; gap:8px; justify-content:center; margin-bottom:24px;
+    }
+    .step-dot {
+      width: 28px; height: 4px; border-radius: 2px;
+      background: var(--border); transition: background 0.3s;
+    }
+    .step-dot.active { background: var(--neon-purple); box-shadow: 0 0 8px var(--neon-purple); }
+    .step-dot.done   { background: var(--neon-green); }
+
+    .step { display:none; }
+    .step.active { display:block; }
+
+    .platform-grid {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 6px;
+    }
+    .platform-btn {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 4px;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition);
+      color: var(--text-muted);
+      font-size: 10px;
+      font-family: var(--font-head);
+      letter-spacing: 0.05em;
+    }
+    .platform-btn .p-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+    .platform-btn:hover,
+    .platform-btn.selected {
+      border-color: var(--neon-purple);
+      background: rgba(123,44,255,0.12);
+      color: var(--neon-purple);
+      box-shadow: 0 0 12px rgba(123,44,255,0.3);
+    }
+
+    .games-input-wrap { position: relative; }
+    .games-tags {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      min-height: 32px; margin-top: 8px;
+    }
+    .games-tags .game-tag {
+      display: inline-flex; align-items: center; gap: 4px; cursor: default;
+    }
+    .game-tag .remove-tag {
+      cursor: pointer; color: var(--neon-blue); font-size: 14px; line-height: 1;
+      margin-left: 2px;
+    }
+    .game-tag .remove-tag:hover { color: #ff3355; }
+
+    .btn-row {
+      display: flex; gap: 10px; margin-top: 20px;
+    }
+    .btn-row .btn { flex: 1; padding: 13px; font-size: 12px; }
+
+    .error-msg {
+      background: rgba(255,51,85,0.1); border: 1px solid rgba(255,51,85,0.3);
+      border-radius: var(--radius); color: #ff3355; font-size: 13px;
+      padding: 10px 14px; margin-top: 10px; display: none;
+    }
+    .login-link { text-align:center; margin-top:18px; font-size:13px; color:var(--text-muted); }
+    .login-link a { color:var(--neon-green); }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="auth-wrap">
+    <div class="logo">
+      <a class="back-link" href="index.html">← Voltar</a>
+      <div class="logo-name">INSERT COIN</div>
+    </div>
+
+    <div class="auth-card">
+      <div class="pixel-corner pc-tl"></div>
+      <div class="pixel-corner pc-tr"></div>
+      <div class="pixel-corner pc-bl"></div>
+      <div class="pixel-corner pc-br"></div>
+
+      <h2>CRIAR CONTA</h2>
+      <div class="step-indicator">
+        <div class="step-dot active" id="dot-0"></div>
+        <div class="step-dot" id="dot-1"></div>
+        <div class="step-dot" id="dot-2"></div>
+      </div>
+
+      <!-- Step 1: Credenciais -->
+      <div class="step active" id="step-0">
+        <div class="form-group">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" placeholder="seu@email.com" />
+        </div>
+        <div class="form-group">
+          <label for="password">Senha</label>
+          <input type="password" id="password" placeholder="Mínimo 6 caracteres" />
+        </div>
+        <div class="form-group">
+          <label for="confirm">Confirmar senha</label>
+          <input type="password" id="confirm" placeholder="Repita a senha" />
+        </div>
+        <div class="error-msg" id="err-0"></div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="next-0">PRÓXIMO ▶</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Gamer identity -->
+      <div class="step" id="step-1">
+        <div class="form-group">
+          <label for="nickname">Nickname Gamer</label>
+          <input type="text" id="nickname" placeholder="Seu nome na arena" maxlength="20" />
+        </div>
+        <div class="form-group">
+          <label>Plataforma Principal</label>
+          <div class="platform-grid">
+            <div class="platform-btn" data-platform="PC"><span class="p-icon">🖥️</span>PC</div>
+            <div class="platform-btn" data-platform="PlayStation"><span class="p-icon">🎮</span>PS</div>
+            <div class="platform-btn" data-platform="Xbox"><span class="p-icon">🟩</span>Xbox</div>
+            <div class="platform-btn" data-platform="Nintendo"><span class="p-icon">🔴</span>Switch</div>
+            <div class="platform-btn" data-platform="Mobile"><span class="p-icon">📱</span>Mobile</div>
+          </div>
+          <input type="hidden" id="platform" />
+        </div>
+        <div class="error-msg" id="err-1"></div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" id="back-1">◀ VOLTAR</button>
+          <button class="btn btn-primary" id="next-1">PRÓXIMO ▶</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Jogos favoritos -->
+      <div class="step" id="step-2">
+        <div class="form-group">
+          <label>Jogos Favoritos</label>
+          <div class="games-input-wrap">
+            <input type="text" id="game-input" placeholder="Digite e pressione Enter" maxlength="30" />
+          </div>
+          <div class="games-tags" id="games-tags"></div>
+        </div>
+        <div class="error-msg" id="err-2"></div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" id="back-2">◀ VOLTAR</button>
+          <button class="btn btn-primary" id="btn-register">
+            <span id="reg-text">🎮 CRIAR CONTA</span>
+            <div class="spinner" id="reg-spinner" style="display:none"></div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="login-link">Já tem conta? <a href="index.html">Entrar</a></div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script type="module">
+    import { registerUser } from "./auth.js";
+    import { createUserProfile } from "./firestore.js";
+
+    let currentStep = 0;
+    const games = [];
+    let selectedPlatform = "";
+
+    // Steps navigation
+    function goStep(n) {
+      document.getElementById(`step-${currentStep}`).classList.remove("active");
+      document.getElementById(`dot-${currentStep}`).classList.remove("active");
+      document.getElementById(`dot-${currentStep}`).classList.add("done");
+      currentStep = n;
+      document.getElementById(`step-${currentStep}`).classList.add("active");
+      document.getElementById(`dot-${currentStep}`).classList.add("active");
+    }
+
+    function showErr(id, msg) {
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.style.display = "block";
+    }
+    function hideErr(id) {
+      document.getElementById(id).style.display = "none";
+    }
+    function showToast(msg, type = "success") {
+      const c = document.getElementById("toast-container");
+      const t = document.createElement("div");
+      t.className = `toast ${type}`;
+      t.textContent = msg;
+      c.appendChild(t);
+      setTimeout(() => t.remove(), 3100);
+    }
+
+    // Step 0 — credenciais
+    document.getElementById("next-0").addEventListener("click", () => {
+      hideErr("err-0");
+      const email = document.getElementById("email").value.trim();
+      const pass  = document.getElementById("password").value;
+      const conf  = document.getElementById("confirm").value;
+      if (!email || !pass || !conf) return showErr("err-0", "Preencha todos os campos.");
+      if (!/\S+@\S+\.\S+/.test(email)) return showErr("err-0", "E-mail inválido.");
+      if (pass.length < 6) return showErr("err-0", "Senha deve ter pelo menos 6 caracteres.");
+      if (pass !== conf) return showErr("err-0", "As senhas não coincidem.");
+      goStep(1);
+    });
+
+    // Step 1 — plataforma
+    document.querySelectorAll(".platform-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".platform-btn").forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        selectedPlatform = btn.dataset.platform;
+        document.getElementById("platform").value = selectedPlatform;
+      });
+    });
+    document.getElementById("back-1").addEventListener("click", () => {
+      document.getElementById(`dot-${currentStep}`).classList.remove("done", "active");
+      currentStep = 0;
+      document.getElementById("step-1").classList.remove("active");
+      document.getElementById("step-0").classList.add("active");
+      document.getElementById("dot-0").classList.add("active");
+      document.getElementById("dot-0").classList.remove("done");
+    });
+    document.getElementById("next-1").addEventListener("click", () => {
+      hideErr("err-1");
+      const nick = document.getElementById("nickname").value.trim();
+      if (!nick) return showErr("err-1", "Escolha um nickname.");
+      if (nick.length < 3) return showErr("err-1", "Nickname muito curto.");
+      if (!selectedPlatform) return showErr("err-1", "Selecione sua plataforma principal.");
+      goStep(2);
+    });
+
+    // Step 2 — jogos
+    document.getElementById("back-2").addEventListener("click", () => {
+      document.getElementById(`dot-${currentStep}`).classList.remove("done", "active");
+      currentStep = 1;
+      document.getElementById("step-2").classList.remove("active");
+      document.getElementById("step-1").classList.add("active");
+      document.getElementById("dot-1").classList.add("active");
+      document.getElementById("dot-1").classList.remove("done");
+    });
+
+    const gameInput = document.getElementById("game-input");
+    const gamesTags = document.getElementById("games-tags");
+
+    function addGame(name) {
+      if (!name || games.includes(name) || games.length >= 8) return;
+      games.push(name);
+      const tag = document.createElement("span");
+      tag.className = "game-tag";
+      tag.innerHTML = `${name} <span class="remove-tag" data-game="${name}">×</span>`;
+      tag.querySelector(".remove-tag").addEventListener("click", () => {
+        const idx = games.indexOf(name);
+        if (idx > -1) games.splice(idx, 1);
+        tag.remove();
+      });
+      gamesTags.appendChild(tag);
+    }
+
+    gameInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        addGame(gameInput.value.trim());
+        gameInput.value = "";
+      }
+    });
+
+    // Register
+    const btnReg    = document.getElementById("btn-register");
+    const regText   = document.getElementById("reg-text");
+    const regSpinner = document.getElementById("reg-spinner");
+
+    const firebaseErrors = {
+      "auth/email-already-in-use": "Este e-mail já está em uso.",
+      "auth/invalid-email": "E-mail inválido.",
+      "auth/weak-password": "Senha muito fraca."
+    };
+
+    btnReg.addEventListener("click", async () => {
+      hideErr("err-2");
+      btnReg.disabled = true;
+      regText.style.display = "none";
+      regSpinner.style.display = "block";
+
+      const email    = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const nickname = document.getElementById("nickname").value.trim();
+
+      try {
+        const cred = await registerUser(email, password);
+        await createUserProfile(cred.user.uid, {
+          email,
+          nickname,
+          mainPlatform: selectedPlatform,
+          favoriteGames: games
+        });
+        showToast("Conta criada! Bem-vindo à arena! 🎮");
+        setTimeout(() => (window.location.href = "home.html"), 1000);
+      } catch (e) {
+        showErr("err-2", firebaseErrors[e.code] || "Erro ao criar conta. Tente novamente.");
+        btnReg.disabled = false;
+        regText.style.display = "inline";
+        regSpinner.style.display = "none";
+      }
+    });
+  </script>
+</body>
+</html>
