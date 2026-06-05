@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Insert Coin — Squads</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
+  <style>
+    body { background: var(--bg); }
+    .bg-grid { position:fixed;inset:0;background-image:linear-gradient(rgba(123,44,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(123,44,255,0.025) 1px,transparent 1px);background-size:50px 50px;pointer-events:none; }
+
+    .topbar { position:sticky;top:0;z-index:100;background:rgba(5,5,16,0.92);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;gap:16px; }
+    .topbar-logo { font-family:var(--font-head);font-size:16px;font-weight:900;letter-spacing:0.1em;color:var(--neon-green);text-shadow:var(--glow-green); }
+    .topbar-nav { display:flex;gap:8px; }
+
+    .page-wrap { max-width:1100px;margin:0 auto;padding:24px 20px;display:grid;grid-template-columns:1fr 360px;gap:24px;position:relative;z-index:1; }
+    @media(max-width:800px){ .page-wrap{grid-template-columns:1fr;} }
+
+    h1 { font-family:var(--font-head);font-size:18px;font-weight:900;letter-spacing:0.1em;color:var(--text);margin-bottom:20px; }
+    h1 span { color:var(--neon-purple);text-shadow:var(--glow-purple); }
+
+    /* Squad card */
+    .squad-big-card {
+      background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;
+      transition:border-color var(--transition);margin-bottom:12px;
+    }
+    .squad-big-card:hover { border-color:rgba(123,44,255,0.35); }
+    .squad-card-head { display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px; }
+    .squad-card-name { font-family:var(--font-head);font-size:16px;color:var(--neon-purple);text-shadow:var(--glow-purple); }
+    .squad-card-owner { font-size:11px;color:var(--text-muted);font-family:var(--font-mono); }
+    .squad-status { display:inline-block;padding:2px 10px;border-radius:100px;font-family:var(--font-head);font-size:10px;letter-spacing:0.05em; }
+    .squad-status.aberto { background:rgba(0,255,200,0.12);border:1px solid rgba(0,255,200,0.3);color:var(--neon-green); }
+    .squad-status.cheio  { background:rgba(255,51,85,0.12);border:1px solid rgba(255,51,85,0.3);color:#ff3355; }
+    .squad-desc { font-size:13px;color:var(--text-muted);margin-bottom:12px;line-height:1.5; }
+    .squad-tags { display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px; }
+    .squad-members { font-size:12px;color:var(--text-muted);font-family:var(--font-mono);margin-bottom:14px; }
+    .squad-members strong { color:var(--text); }
+    .squad-actions { display:flex;gap:8px;flex-wrap:wrap; }
+
+    /* Create form */
+    .create-form { background:var(--bg-card);border:1px solid rgba(123,44,255,0.25);border-radius:var(--radius-lg);padding:24px;position:sticky;top:76px; }
+    .create-form h2 { font-family:var(--font-head);font-size:13px;letter-spacing:0.1em;color:var(--neon-purple);margin-bottom:20px; }
+
+    .filter-bar { display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px; }
+    .filter-btn { padding:5px 12px;font-size:10px;border-radius:100px; }
+    .filter-btn.active { background:rgba(123,44,255,0.2);border-color:var(--neon-purple);color:var(--neon-purple); }
+
+    .squad-empty { text-align:center;padding:40px 20px;color:var(--text-muted); }
+
+    .member-chip { display:inline-flex;align-items:center;background:rgba(0,224,255,0.08);border:1px solid rgba(0,224,255,0.2);border-radius:100px;padding:2px 10px;font-size:11px;color:var(--neon-blue);font-family:var(--font-head);margin:2px; }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <header class="topbar">
+    <div class="topbar-logo">🎮 INSERT COIN</div>
+    <div class="topbar-nav">
+      <a class="btn btn-ghost" href="home.html" style="padding:6px 14px;font-size:10px;">← FEED</a>
+      <button class="btn btn-danger" id="btn-logout" style="padding:6px 14px;font-size:10px;">SAIR</button>
+    </div>
+  </header>
+
+  <div class="page-wrap">
+    <!-- SQUAD LIST -->
+    <div>
+      <h1>🛡️ <span>SQUADS</span> DA ARENA</h1>
+
+      <div class="filter-bar">
+        <button class="btn btn-ghost filter-btn active" data-filter="todos">Todos</button>
+        <button class="btn btn-ghost filter-btn" data-filter="aberto">Abertos</button>
+        <button class="btn btn-ghost filter-btn" data-filter="meus">Meus Squads</button>
+      </div>
+
+      <div id="squads-loading" class="feed-loading"><div class="spinner"></div></div>
+      <div id="squads-list"></div>
+    </div>
+
+    <!-- CREATE SQUAD -->
+    <div class="create-form">
+      <h2>// CRIAR SQUAD</h2>
+      <div class="form-group">
+        <label for="sq-name">Nome do Squad</label>
+        <input type="text" id="sq-name" placeholder="Ex: Rush B Crew" maxlength="30" />
+      </div>
+      <div class="form-group">
+        <label for="sq-game">Jogo</label>
+        <input type="text" id="sq-game" placeholder="Ex: CS2, Valorant, LoL..." maxlength="30" />
+      </div>
+      <div class="form-group">
+        <label for="sq-platform">Plataforma</label>
+        <select id="sq-platform">
+          <option value="PC">PC</option>
+          <option value="PlayStation">PlayStation</option>
+          <option value="Xbox">Xbox</option>
+          <option value="Nintendo">Nintendo</option>
+          <option value="Mobile">Mobile</option>
+          <option value="Multiplataforma">Multiplataforma</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="sq-max">Vagas (máx. jogadores)</label>
+        <select id="sq-max">
+          <option value="2">2 jogadores</option>
+          <option value="3">3 jogadores</option>
+          <option value="4">4 jogadores</option>
+          <option value="5" selected>5 jogadores</option>
+          <option value="6">6 jogadores</option>
+          <option value="10">10 jogadores</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="sq-desc">Descrição</label>
+        <textarea id="sq-desc" placeholder="Descreva o squad, requisitos, estilo de jogo..." maxlength="200"></textarea>
+      </div>
+      <div class="error-msg" id="sq-error"></div>
+      <button class="btn btn-primary" id="btn-create-squad" style="width:100%;padding:13px;">
+        <span id="sq-btn-text">🛡️ CRIAR SQUAD</span>
+        <div class="spinner" id="sq-spinner" style="display:none"></div>
+      </button>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+  <script type="module" src="squads.js"></script>
+</body>
+</html>

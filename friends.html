@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Insert Coin — Amigos</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
+  <style>
+    body { background: var(--bg); }
+    .bg-grid { position:fixed;inset:0;background-image:linear-gradient(rgba(0,224,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,224,255,0.025) 1px,transparent 1px);background-size:60px 60px;pointer-events:none; }
+    .topbar { position:sticky;top:0;z-index:100;background:rgba(5,5,16,0.92);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;gap:16px; }
+    .topbar-logo { font-family:var(--font-head);font-size:16px;font-weight:900;letter-spacing:0.1em;color:var(--neon-green);text-shadow:var(--glow-green); }
+
+    .page-wrap { max-width:900px;margin:0 auto;padding:24px 20px;position:relative;z-index:1; }
+    h1 { font-family:var(--font-head);font-size:18px;font-weight:900;letter-spacing:0.1em;color:var(--text);margin-bottom:20px; }
+    h1 span { color:var(--neon-blue);text-shadow:var(--glow-blue); }
+
+    .search-bar { display:flex;gap:8px;margin-bottom:24px; }
+    .search-bar input { flex:1; }
+
+    .section-block { margin-bottom:32px; }
+    .section-head { font-family:var(--font-head);font-size:11px;letter-spacing:0.15em;color:var(--text-muted);margin-bottom:12px;display:flex;align-items:center;gap:8px; }
+    .section-head::after { content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--neon-blue),transparent);opacity:0.3; }
+
+    .player-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px; }
+
+    .player-card {
+      background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);
+      padding:16px;text-align:center;transition:border-color var(--transition);
+    }
+    .player-card:hover { border-color:rgba(0,224,255,0.25); }
+    .player-card .avatar { width:52px;height:52px;font-size:20px;margin:0 auto 10px; }
+    .player-card .p-nick { font-family:var(--font-head);font-size:13px;color:var(--text);margin-bottom:4px; }
+    .player-card .p-meta { font-size:11px;color:var(--text-muted);margin-bottom:10px; }
+    .player-card .p-actions { display:flex;gap:6px;justify-content:center;flex-wrap:wrap; }
+
+    .req-card {
+      background:var(--bg-card);border:1px solid rgba(0,255,200,0.2);border-radius:var(--radius-lg);
+      padding:14px;display:flex;align-items:center;gap:12px;margin-bottom:8px;
+    }
+    .req-card .p-nick { font-family:var(--font-head);font-size:12px;color:var(--text);margin-bottom:2px; }
+    .req-card .p-meta { font-size:11px;color:var(--text-muted); }
+    .req-actions { margin-left:auto;display:flex;gap:6px; }
+
+    .search-results { display:flex;flex-direction:column;gap:8px;margin-top:8px; }
+    .search-result-item {
+      background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);
+      padding:12px;display:flex;align-items:center;gap:10px;transition:border-color var(--transition);
+    }
+    .search-result-item:hover { border-color:rgba(0,224,255,0.2); }
+
+    .empty-state { text-align:center;padding:30px;color:var(--text-muted);font-size:14px; }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <header class="topbar">
+    <div class="topbar-logo">🎮 INSERT COIN</div>
+    <div style="display:flex;gap:8px;">
+      <a class="btn btn-ghost" href="home.html" style="padding:6px 14px;font-size:10px;">← FEED</a>
+      <button class="btn btn-danger" id="btn-logout" style="padding:6px 14px;font-size:10px;">SAIR</button>
+    </div>
+  </header>
+
+  <div class="page-wrap">
+    <h1>👥 <span>AMIGOS</span></h1>
+
+    <!-- Search -->
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Buscar jogadores pelo nickname..." />
+      <button class="btn btn-primary" id="btn-search" style="padding:10px 20px;font-size:12px;">🔍 BUSCAR</button>
+    </div>
+    <div id="search-results" class="search-results"></div>
+
+    <!-- Friend Requests -->
+    <div class="section-block" id="reqs-section" style="display:none">
+      <div class="section-head">Pedidos de Amizade <span id="reqs-count" style="color:var(--neon-green)"></span></div>
+      <div id="reqs-list"></div>
+    </div>
+
+    <!-- Friends list -->
+    <div class="section-block">
+      <div class="section-head">Meus Amigos <span id="friends-count" style="color:var(--text-muted);font-size:10px;"></span></div>
+      <div id="friends-loading" class="feed-loading"><div class="spinner"></div></div>
+      <div class="player-grid" id="friends-grid"></div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script type="module">
+    import { requireAuth, logoutUser } from "./auth.js";
+    import {
+      getUserProfile, searchUsers, sendFriendRequest,
+      acceptFriendRequest, rejectFriendRequest, removeFriend, getFriends
+    } from "./firestore.js";
+
+    let currentUser = null;
+    let userProfile = null;
+
+    const user = await requireAuth("index.html");
+    currentUser = user;
+    userProfile = await getUserProfile(user.uid);
+
+    loadFriends();
+    loadRequests();
+
+    // ── SEARCH ────────────────────────────────
+    document.getElementById("btn-search").addEventListener("click", doSearch);
+    document.getElementById("search-input").addEventListener("keydown", e => { if (e.key === "Enter") doSearch(); });
+
+    async function doSearch() {
+      const term = document.getElementById("search-input").value.trim();
+      const container = document.getElementById("search-results");
+      if (!term) { container.innerHTML = ""; return; }
+
+      container.innerHTML = `<div style="color:var(--text-muted);font-size:13px;padding:8px;">Buscando...</div>`;
+      const results = await searchUsers(term).catch(() => []);
+      const filtered = results.filter(u => u.uid !== currentUser.uid);
+
+      if (!filtered.length) {
+        container.innerHTML = `<div class="empty-state">Nenhum jogador encontrado.</div>`;
+        return;
+      }
+
+      const myFriends = userProfile?.friends || [];
+      const myReqs    = userProfile?.friendRequests || [];
+
+      container.innerHTML = "";
+      filtered.forEach(p => {
+        const isFriend  = myFriends.includes(p.uid);
+        const isPending = myReqs.includes(p.uid);
+        const item = document.createElement("div");
+        item.className = "search-result-item";
+        item.innerHTML = `
+          <div class="avatar" style="width:36px;height:36px;font-size:14px;">${(p.nickname||"?")[0].toUpperCase()}</div>
+          <div style="flex:1">
+            <div style="font-family:var(--font-head);font-size:12px;color:var(--text);">${escHtml(p.nickname)}</div>
+            <div style="font-size:11px;color:var(--text-muted);">${escHtml(p.mainPlatform||"")} ${p.city ? `· ${escHtml(p.city)}` : ""}</div>
+          </div>
+          <div>
+            ${isFriend
+              ? `<span style="color:var(--neon-green);font-size:11px;font-family:var(--font-head);">✅ Amigo</span>`
+              : isPending
+              ? `<span style="color:var(--text-muted);font-size:11px;font-family:var(--font-head);">⏳ Pendente</span>`
+              : `<button class="btn btn-outline add-btn" data-uid="${p.uid}" data-nick="${escHtml(p.nickname)}" style="padding:5px 12px;font-size:10px;">➕ Adicionar</button>`
+            }
+          </div>`;
+        item.querySelector(".add-btn")?.addEventListener("click", async (e) => {
+          const uid  = e.currentTarget.dataset.uid;
+          const nick = e.currentTarget.dataset.nick;
+          await sendFriendRequest(currentUser.uid, uid).catch(() => {});
+          e.currentTarget.outerHTML = `<span style="color:var(--text-muted);font-size:11px;font-family:var(--font-head);">⏳ Enviado</span>`;
+          showToast(`Pedido enviado para ${nick}!`);
+        });
+        container.appendChild(item);
+      });
+    }
+
+    // ── REQUESTS ──────────────────────────────
+    async function loadRequests() {
+      if (!userProfile?.friendRequests?.length) return;
+      const section = document.getElementById("reqs-section");
+      const list    = document.getElementById("reqs-list");
+      const count   = document.getElementById("reqs-count");
+      const reqs    = userProfile.friendRequests;
+
+      section.style.display = "block";
+      count.textContent = `(${reqs.length})`;
+
+      const profiles = await Promise.all(reqs.map(uid => getUserProfile(uid)));
+      list.innerHTML = "";
+      profiles.filter(Boolean).forEach(p => {
+        const card = document.createElement("div");
+        card.className = "req-card";
+        card.innerHTML = `
+          <div class="avatar" style="width:36px;height:36px;font-size:14px;">${(p.nickname||"?")[0].toUpperCase()}</div>
+          <div>
+            <div class="p-nick">${escHtml(p.nickname)}</div>
+            <div class="p-meta">${escHtml(p.mainPlatform||"")}</div>
+          </div>
+          <div class="req-actions">
+            <button class="btn btn-primary accept-btn" data-uid="${p.uid}" style="padding:6px 12px;font-size:10px;">✓ Aceitar</button>
+            <button class="btn btn-danger reject-btn" data-uid="${p.uid}" style="padding:6px 12px;font-size:10px;">✕</button>
+          </div>`;
+        card.querySelector(".accept-btn").addEventListener("click", async (e) => {
+          await acceptFriendRequest(currentUser.uid, e.currentTarget.dataset.uid);
+          showToast("Amizade aceita! +5 XP 👥");
+          userProfile = await getUserProfile(currentUser.uid);
+          card.remove(); loadFriends();
+        });
+        card.querySelector(".reject-btn").addEventListener("click", async (e) => {
+          await rejectFriendRequest(currentUser.uid, e.currentTarget.dataset.uid);
+          userProfile = await getUserProfile(currentUser.uid);
+          card.remove();
+        });
+        list.appendChild(card);
+      });
+    }
+
+    // ── FRIENDS LIST ──────────────────────────
+    async function loadFriends() {
+      const grid    = document.getElementById("friends-grid");
+      const loading = document.getElementById("friends-loading");
+      const countEl = document.getElementById("friends-count");
+      loading.style.display = "flex"; grid.innerHTML = "";
+
+      const friends = await getFriends(currentUser.uid).catch(() => []);
+      loading.style.display = "none";
+      countEl.textContent = friends.length ? `(${friends.length})` : "";
+
+      if (!friends.length) {
+        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">Você ainda não tem amigos.<br>Use a busca para encontrar jogadores!</div>`;
+        return;
+      }
+
+      friends.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "player-card";
+        card.innerHTML = `
+          <div class="avatar">${(p.nickname||"?")[0].toUpperCase()}</div>
+          <div class="p-nick">${escHtml(p.nickname)}</div>
+          <div class="p-meta">
+            ${escHtml(p.mainPlatform||"")}
+            ${p.city ? `· ${escHtml(p.city)}` : ""}
+            <br>
+            <span style="color:${p.isOnline ? "var(--neon-green)" : "var(--text-muted)"}">
+              ${p.isOnline ? "🟢 Online" : "⚫ Offline"}
+            </span>
+          </div>
+          <div class="p-actions">
+            <button class="btn btn-danger remove-btn" data-uid="${p.uid}" data-nick="${escHtml(p.nickname)}" style="padding:5px 10px;font-size:10px;">Remover</button>
+          </div>`;
+        card.querySelector(".remove-btn").addEventListener("click", async (e) => {
+          if (!confirm(`Remover ${e.currentTarget.dataset.nick} da sua lista?`)) return;
+          await removeFriend(currentUser.uid, e.currentTarget.dataset.uid);
+          showToast("Amigo removido.");
+          userProfile = await getUserProfile(currentUser.uid);
+          card.remove();
+        });
+        grid.appendChild(card);
+      });
+    }
+
+    document.getElementById("btn-logout").addEventListener("click", async () => {
+      await logoutUser(); window.location.href = "index.html";
+    });
+
+    function showToast(msg, type = "success") {
+      const c = document.getElementById("toast-container");
+      const t = document.createElement("div");
+      t.className = `toast ${type}`; t.textContent = msg; c.appendChild(t);
+      setTimeout(() => t.remove(), 3100);
+    }
+    function escHtml(str) {
+      return String(str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+  </script>
+</body>
+</html>

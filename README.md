@@ -1,153 +1,92 @@
-# 🎮 INSERT COIN — Rede Social Gamer
+# 🎮 INSERT COIN v2 — Guia de Atualização
 
-Protótipo funcional da rede social gamer Insert Coin com Firebase Authentication + Firestore.
+## 📁 Arquivos desta versão
 
----
+Substitua os arquivos abaixo no seu repositório GitHub (ou suba todos novamente para a Vercel):
 
-## 📁 Estrutura de Arquivos
+| Arquivo | O que mudou |
+|---|---|
+| `firestore.js` | Amigos, squads, presença online, admin, localização |
+| `home.html` + `home.js` | Feed real, fotos, notícias, squads, players online |
+| `profile.html` + `profile.js` | Localização, links de plataformas |
+| `squads.html` + `squads.js` | Página completa de squads |
+| `friends.html` | Página de amigos com busca e pedidos |
+| `admin.html` | Painel de administração |
+| `upload.js` | Helper de upload de imagens (Cloudinary) |
 
-```
-insert-coin/
-├── index.html          ← Tela de Login
-├── signup.html         ← Cadastro (3 etapas)
-├── home.html           ← Home / Feed (protegida)
-├── profile.html        ← Perfil do usuário (protegido)
-├── style.css           ← Estilos globais (dark/neon/gamer)
-├── firebase-config.js  ← ⚠️ Credenciais Firebase (EDITE AQUI)
-├── auth.js             ← Helpers de autenticação
-├── firestore.js        ← Helpers do Firestore
-├── home.js             ← Lógica da home
-├── profile.js          ← Lógica do perfil
-└── README.md           ← Este arquivo
-```
+Arquivos **não alterados** (não precisa substituir):
+- `firebase-config.js`, `auth.js`, `style.css`, `index.html`, `signup.html`
 
 ---
 
-## 🔥 Configuração Firebase (OBRIGATÓRIO)
+## 🖼️ Configurar Upload de Imagens (Cloudinary — GRATUITO)
 
-### 1. Criar projeto Firebase
+O Cloudinary oferece 25GB gratuitos para armazenar imagens.
 
-1. Acesse https://console.firebase.google.com
-2. Clique em **"Adicionar projeto"**
-3. Dê um nome (ex: `insert-coin`)
-4. Desative o Google Analytics se preferir
-5. Clique em **"Criar projeto"**
-
-### 2. Ativar Authentication
-
-1. No menu lateral: **Authentication → Primeiros passos**
-2. Aba **Método de login**
-3. Ative **E-mail/senha**
-
-### 3. Criar Firestore Database
-
-1. No menu lateral: **Firestore Database → Criar banco de dados**
-2. Selecione **Modo de teste** (para desenvolvimento)
-3. Escolha a região (ex: `southamerica-east1` para Brasil)
-
-### 4. Obter credenciais do app
-
-1. Clique no ícone **⚙️ Configurações do projeto**
-2. Role até **"Seus apps"**
-3. Clique em **`</>`** para adicionar app Web
-4. Registre com um nome (ex: `insert-coin-web`)
-5. Copie o objeto `firebaseConfig`
-
-### 5. Editar firebase-config.js
-
-Abra `firebase-config.js` e substitua os valores:
-
+1. Crie conta em **[cloudinary.com](https://cloudinary.com)** (pode usar Google)
+2. No dashboard, copie o seu **Cloud name** (ex: `dxyz123abc`)
+3. No menu lateral: **Settings → Upload**
+4. Role até **"Upload presets"** e clique em **"Add upload preset"**
+5. Configure:
+   - **Signing mode**: `Unsigned`
+   - **Preset name**: anote (ex: `insertcoin_posts`)
+6. Clique em **Save**
+7. Abra `upload.js` e substitua:
 ```javascript
-const firebaseConfig = {
-  apiKey: "SUA_API_KEY_REAL",
-  authDomain: "SEU_PROJETO.firebaseapp.com",
-  projectId: "SEU_PROJETO_ID",
-  storageBucket: "SEU_PROJETO.appspot.com",
-  messagingSenderId: "SEU_MESSAGING_ID",
-  appId: "SEU_APP_ID"
-};
+const CLOUD_NAME    = "dxyz123abc";       // seu Cloud name
+const UPLOAD_PRESET = "insertcoin_posts"; // seu preset name
 ```
 
----
-
-## 🌐 Deploy no Netlify (gratuito)
-
-### Opção A — Interface Web
-1. Acesse https://netlify.com → **"Add new site"**
-2. Escolha **"Deploy manually"**
-3. Arraste a pasta `insert-coin` para a área de upload
-4. Pronto! Netlify gera uma URL pública
-
-### Opção B — GitHub + Netlify CI
-1. Suba o projeto em um repositório GitHub
-2. No Netlify: **"New site from Git"**
-3. Conecte o repositório
-4. Build command: deixe vazio
-5. Publish directory: `/` (raiz)
-6. Deploy!
+> Sem isso, o upload de fotos não funcionará, mas o resto do app funciona normalmente.
 
 ---
 
-## ▲ Deploy na Vercel (gratuito)
+## 🔐 Ativar seu perfil de Admin
 
-1. Acesse https://vercel.com → **"New Project"**
-2. Importe do GitHub ou faça upload manual
-3. Framework preset: **"Other"**
-4. Deploy!
+Após criar sua conta na Insert Coin:
+
+1. Acesse o **Firebase Console → Firestore**
+2. Clique na coleção `users`
+3. Encontre o documento com o seu UID (mesmo e-mail que você usou)
+4. Clique em **Editar (lápis)**
+5. Encontre o campo `isAdmin` e mude para `true`
+6. Salve
+
+Pronto — o menu Admin aparecerá na sidebar e você poderá acessar `insertcoin-chi.vercel.app/admin.html`.
 
 ---
 
-## ✅ Funcionalidades Implementadas
+## ✅ Funcionalidades desta versão
 
 | Feature | Status |
 |---|---|
-| Cadastro com e-mail/senha | ✅ |
-| Login / Logout | ✅ |
-| Redefinição de senha | ✅ |
-| Perfil salvo no Firestore | ✅ |
-| Editar perfil | ✅ |
-| Sistema de XP e nível | ✅ |
-| Criar posts no feed | ✅ |
-| Curtir posts (+XP) | ✅ |
-| Feed global em tempo real | ✅ |
-| Layout responsivo mobile | ✅ |
-| Proteção de rotas | ✅ |
-| Toasts de notificação | ✅ |
-
-## 🔜 Funcionalidades Futuras (estrutura pronta)
-
-- Sistema de amigos
-- Squads (coleção `squads` já criada)
-- Eventos & eSports (coleção `events` já criada)
-- Comentários em posts
-- Matchmaking por jogos/plataforma
-- Upload de avatar e banner (Firebase Storage)
-- Notificações em tempo real (Firestore listeners)
-- Monetização / banners patrocinados
+| Players online em tempo real | ✅ |
+| Squads — criar, entrar, sair, deletar | ✅ |
+| Sistema de amigos completo | ✅ |
+| Pedidos de amizade | ✅ |
+| Post com foto (Cloudinary) | ✅ |
+| Deletar post | ✅ |
+| Comentários nos posts | ✅ |
+| Curtir / descurtir posts | ✅ |
+| Notícias gamer (IGN BR, The Enemy, Voxel) | ✅ |
+| Perfil com cidade / estado / país | ✅ |
+| Links Discord, Steam, Epic, Xbox, PSN, Twitch, YouTube | ✅ |
+| Painel Admin (banir, promover, dar XP) | ✅ |
 
 ---
 
-## 🎨 Paleta de Cores
+## 📰 Sobre as Notícias
 
-| Nome | Hex |
-|---|---|
-| Background | `#050510` |
-| Card | `#0a0b1e` |
-| Neon Verde | `#00ffc8` |
-| Neon Azul | `#00e0ff` |
-| Neon Roxo | `#7b2cff` |
-| Texto | `#f5f7ff` |
-| Texto Muted | `#a4a7c4` |
+As notícias são carregadas via **rss2json.com** (serviço gratuito que converte RSS em JSON).
+- IGN Brasil, The Enemy e Voxel são carregados automaticamente
+- Se algum feed falhar, a mensagem de erro aparece sem quebrar o app
 
 ---
 
-## 💡 Dicas de Expansão
+## 🛠️ Próximas features sugeridas
 
-- Para adicionar **upload de avatar**: habilite Firebase Storage e use `uploadBytes + getDownloadURL`
-- Para **feed em tempo real**: substitua `getDocs` por `onSnapshot` no `home.js`
-- Para **notificações**: crie uma coleção `notifications` e use listeners
-- Para **busca de jogadores**: implemente índices compostos no Firestore (Firestore Index)
-
----
-
-Feito com ❤️ + neon + caffeine
+- Upload de avatar no perfil (Cloudinary já está pronto)
+- Notificações em tempo real (Firestore `onSnapshot`)
+- Eventos e eSports
+- Matchmaking por jogos em comum
+- Página de perfil público de outros usuários

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Insert Coin — Admin</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔐</text></svg>" />
+  <style>
+    body { background: var(--bg); }
+    .bg-grid { position:fixed;inset:0;background-image:linear-gradient(rgba(255,44,240,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,44,240,0.025) 1px,transparent 1px);background-size:50px 50px;pointer-events:none; }
+    .topbar { position:sticky;top:0;z-index:100;background:rgba(5,5,16,0.92);border-bottom:1px solid rgba(255,44,240,0.2);backdrop-filter:blur(12px);padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;gap:16px; }
+    .topbar-logo { font-family:var(--font-head);font-size:16px;font-weight:900;letter-spacing:0.1em;color:var(--neon-pink);text-shadow:0 0 18px rgba(255,44,240,0.5); }
+
+    .page-wrap { max-width:1100px;margin:0 auto;padding:24px 20px;position:relative;z-index:1; }
+    h1 { font-family:var(--font-head);font-size:18px;font-weight:900;letter-spacing:0.1em;color:var(--text);margin-bottom:24px; }
+    h1 span { color:var(--neon-pink);text-shadow:0 0 12px rgba(255,44,240,0.5); }
+
+    .stats-row { display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:28px; }
+    .stat-card { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;text-align:center; }
+    .stat-num { font-family:var(--font-head);font-size:28px;font-weight:900;color:var(--neon-pink);text-shadow:0 0 12px rgba(255,44,240,0.4); }
+    .stat-lbl { font-size:11px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:0.08em;margin-top:4px; }
+
+    .admin-search { display:flex;gap:8px;margin-bottom:16px; }
+    .admin-search input { flex:1; }
+
+    /* User table */
+    .user-table { width:100%;border-collapse:collapse;font-size:13px; }
+    .user-table th { font-family:var(--font-head);font-size:10px;letter-spacing:0.1em;color:var(--text-muted);text-align:left;padding:10px 12px;border-bottom:1px solid var(--border); }
+    .user-table td { padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle; }
+    .user-table tr:hover td { background:rgba(255,44,240,0.03); }
+
+    .user-nick { font-family:var(--font-head);font-size:12px;color:var(--text); }
+    .user-email { font-size:11px;color:var(--text-muted);font-family:var(--font-mono); }
+
+    .role-badge { display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-family:var(--font-head);letter-spacing:0.05em; }
+    .role-admin { background:rgba(255,44,240,0.15);border:1px solid rgba(255,44,240,0.3);color:var(--neon-pink); }
+    .role-user  { background:rgba(0,224,255,0.08);border:1px solid rgba(0,224,255,0.2);color:var(--neon-blue); }
+    .role-banned { background:rgba(255,51,85,0.15);border:1px solid rgba(255,51,85,0.3);color:#ff3355; }
+
+    .action-menu { display:flex;gap:4px;flex-wrap:wrap; }
+    .action-btn { padding:4px 8px;font-size:10px;border-radius:6px;cursor:pointer;border:1px solid;font-family:var(--font-head);letter-spacing:0.04em;transition:all var(--transition); }
+    .action-btn.ban { border-color:rgba(255,51,85,0.4);color:#ff3355;background:rgba(255,51,85,0.08); }
+    .action-btn.ban:hover { background:rgba(255,51,85,0.2); }
+    .action-btn.unban { border-color:rgba(0,255,200,0.4);color:var(--neon-green);background:rgba(0,255,200,0.08); }
+    .action-btn.promote { border-color:rgba(255,44,240,0.4);color:var(--neon-pink);background:rgba(255,44,240,0.08); }
+    .action-btn.promote:hover { background:rgba(255,44,240,0.2); }
+    .action-btn.demote { border-color:rgba(123,44,255,0.4);color:var(--neon-purple);background:rgba(123,44,255,0.08); }
+    .action-btn.xp { border-color:rgba(0,224,255,0.4);color:var(--neon-blue);background:rgba(0,224,255,0.08); }
+    .action-btn.xp:hover { background:rgba(0,224,255,0.2); }
+
+    .xp-input-row { display:flex;gap:4px;align-items:center;margin-top:4px; }
+    .xp-input-row input { width:70px;font-size:12px;padding:4px 8px; }
+
+    .online-indicator { display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px; }
+    .is-online  { background:var(--neon-green);box-shadow:0 0 5px var(--neon-green); }
+    .is-offline { background:var(--text-muted); }
+
+    .table-wrap { overflow-x:auto;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:4px 0; }
+
+    .access-denied { display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;text-align:center; }
+    .access-denied .icon { font-size:60px; }
+    .access-denied h2 { font-family:var(--font-head);color:#ff3355;font-size:20px; }
+    .access-denied p { color:var(--text-muted); }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <header class="topbar">
+    <div class="topbar-logo">🔐 PAINEL ADMIN</div>
+    <div style="display:flex;gap:8px;">
+      <a class="btn btn-ghost" href="home.html" style="padding:6px 14px;font-size:10px;">← FEED</a>
+      <button class="btn btn-danger" id="btn-logout" style="padding:6px 14px;font-size:10px;">SAIR</button>
+    </div>
+  </header>
+
+  <!-- ACCESS DENIED (shown until verified) -->
+  <div id="access-denied" class="access-denied" style="display:none;position:relative;z-index:1;">
+    <div class="icon">🚫</div>
+    <h2>ACESSO NEGADO</h2>
+    <p>Você não tem permissão para acessar esta área.</p>
+    <a class="btn btn-outline" href="home.html">Voltar ao Feed</a>
+  </div>
+
+  <div id="admin-panel" class="page-wrap" style="display:none">
+    <h1>🔐 PAINEL DE <span>ADMINISTRAÇÃO</span></h1>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num" id="stat-users">—</div><div class="stat-lbl">USUÁRIOS</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-online">—</div><div class="stat-lbl">ONLINE AGORA</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-banned">—</div><div class="stat-lbl">BANIDOS</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-admins">—</div><div class="stat-lbl">ADMINS</div></div>
+    </div>
+
+    <!-- Search -->
+    <div class="admin-search">
+      <input type="text" id="admin-search" placeholder="Filtrar por nickname ou e-mail..." />
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table class="user-table">
+        <thead>
+          <tr>
+            <th>USUÁRIO</th>
+            <th>PLATAFORMA</th>
+            <th>XP / NÍV</th>
+            <th>STATUS</th>
+            <th>CARGO</th>
+            <th>AÇÕES</th>
+          </tr>
+        </thead>
+        <tbody id="users-table-body">
+          <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script type="module">
+    import { requireAuth, logoutUser } from "./auth.js";
+    import { getUserProfile, getAllUsers, banUser, unbanUser, setAdmin, giveXP, setUserRole } from "./firestore.js";
+
+    let currentUser = null;
+    let allUsers    = [];
+
+    const user = await requireAuth("index.html");
+    currentUser = user;
+    const profile = await getUserProfile(user.uid);
+
+    if (!profile?.isAdmin) {
+      document.getElementById("access-denied").style.display = "flex";
+    } else {
+      document.getElementById("admin-panel").style.display = "block";
+      loadUsers();
+    }
+
+    async function loadUsers() {
+      allUsers = await getAllUsers(200).catch(() => []);
+      updateStats();
+      renderTable(allUsers);
+    }
+
+    function updateStats() {
+      document.getElementById("stat-users").textContent  = allUsers.length;
+      document.getElementById("stat-online").textContent = allUsers.filter(u => u.isOnline).length;
+      document.getElementById("stat-banned").textContent = allUsers.filter(u => u.banned).length;
+      document.getElementById("stat-admins").textContent = allUsers.filter(u => u.isAdmin).length;
+    }
+
+    function renderTable(users) {
+      const tbody = document.getElementById("users-table-body");
+      if (!users.length) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">Nenhum usuário encontrado.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = "";
+      users.forEach(u => tbody.appendChild(buildRow(u)));
+    }
+
+    function buildRow(u) {
+      const row = document.createElement("tr");
+      row.id = `row-${u.uid}`;
+      const isMe = u.uid === currentUser.uid;
+
+      row.innerHTML = `
+        <td>
+          <span class="online-indicator ${u.isOnline ? "is-online" : "is-offline"}"></span>
+          <div class="user-nick">${escHtml(u.nickname || "—")}</div>
+          <div class="user-email">${escHtml(u.email || "—")}</div>
+        </td>
+        <td><span class="platform-badge" style="font-size:10px;">${escHtml(u.mainPlatform || "—")}</span></td>
+        <td style="font-family:var(--font-mono);font-size:11px;color:var(--neon-purple);">${u.xp || 0} XP · Nv${u.level || 1}</td>
+        <td>
+          ${u.banned
+            ? `<span class="role-badge role-banned">BANIDO</span>`
+            : `<span style="color:var(--neon-green);font-size:11px;font-family:var(--font-mono);">ATIVO</span>`}
+        </td>
+        <td>
+          <span class="role-badge ${u.isAdmin ? "role-admin" : "role-user"}">${u.isAdmin ? "ADMIN" : u.role || "USER"}</span>
+        </td>
+        <td>
+          ${isMe ? `<span style="color:var(--text-muted);font-size:11px;">— você mesmo —</span>` : `
+          <div class="action-menu">
+            ${u.banned
+              ? `<button class="action-btn unban" data-uid="${u.uid}">🔓 Desbanir</button>`
+              : `<button class="action-btn ban" data-uid="${u.uid}">🚫 Banir</button>`}
+            ${u.isAdmin
+              ? `<button class="action-btn demote" data-uid="${u.uid}">👤 Remover Admin</button>`
+              : `<button class="action-btn promote" data-uid="${u.uid}">⭐ Tornar Admin</button>`}
+            <div>
+              <div class="xp-input-row">
+                <input type="number" class="xp-amount" placeholder="XP" min="1" max="9999" />
+                <button class="action-btn xp give-xp-btn" data-uid="${u.uid}">+XP</button>
+              </div>
+            </div>
+          </div>`}
+        </td>`;
+
+      // Ban
+      row.querySelector(".ban")?.addEventListener("click", async (e) => {
+        if (!confirm("Banir este usuário?")) return;
+        await banUser(e.currentTarget.dataset.uid);
+        showToast("Usuário banido.");
+        await loadUsers();
+      });
+
+      // Unban
+      row.querySelector(".unban")?.addEventListener("click", async (e) => {
+        await unbanUser(e.currentTarget.dataset.uid);
+        showToast("Usuário desbanido.");
+        await loadUsers();
+      });
+
+      // Promote to admin
+      row.querySelector(".promote")?.addEventListener("click", async (e) => {
+        if (!confirm("Tornar este usuário administrador?")) return;
+        await setAdmin(e.currentTarget.dataset.uid, true);
+        showToast("Usuário promovido a admin! ⭐");
+        await loadUsers();
+      });
+
+      // Demote from admin
+      row.querySelector(".demote")?.addEventListener("click", async (e) => {
+        if (!confirm("Remover cargo de admin?")) return;
+        await setAdmin(e.currentTarget.dataset.uid, false);
+        showToast("Admin removido.");
+        await loadUsers();
+      });
+
+      // Give XP
+      row.querySelector(".give-xp-btn")?.addEventListener("click", async (e) => {
+        const uid    = e.currentTarget.dataset.uid;
+        const input  = e.currentTarget.parentElement.querySelector(".xp-amount");
+        const amount = parseInt(input.value);
+        if (!amount || amount < 1) { showToast("Digite uma quantidade válida.", "error"); return; }
+        await giveXP(uid, amount);
+        showToast(`+${amount} XP concedido!`);
+        input.value = "";
+        await loadUsers();
+      });
+
+      return row;
+    }
+
+    // Filter
+    document.getElementById("admin-search").addEventListener("input", (e) => {
+      const term = e.target.value.toLowerCase();
+      const filtered = allUsers.filter(u =>
+        u.nickname?.toLowerCase().includes(term) || u.email?.toLowerCase().includes(term)
+      );
+      renderTable(filtered);
+    });
+
+    document.getElementById("btn-logout").addEventListener("click", async () => {
+      await logoutUser(); window.location.href = "index.html";
+    });
+
+    function showToast(msg, type = "success") {
+      const c = document.getElementById("toast-container");
+      const t = document.createElement("div");
+      t.className = `toast ${type}`; t.textContent = msg; c.appendChild(t);
+      setTimeout(() => t.remove(), 3100);
+    }
+    function escHtml(str) {
+      return String(str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+  </script>
+</body>
+</html>
