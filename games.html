@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Insert Coin — Jogos</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
+  <style>
+    body { background: var(--bg); }
+    .bg-grid { position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,200,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,200,0.025) 1px,transparent 1px);background-size:50px 50px;pointer-events:none; }
+    .topbar { position:sticky;top:0;z-index:100;background:rgba(5,5,16,0.92);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;gap:16px; }
+    .topbar-logo { font-family:var(--font-head);font-size:16px;font-weight:900;letter-spacing:0.1em;color:var(--neon-green);text-shadow:var(--glow-green); }
+    .topbar-nav { display:flex;gap:8px; }
+
+    .page-wrap { max-width:1000px;margin:0 auto;padding:24px 20px;position:relative;z-index:1; }
+    h1 { font-family:var(--font-head);font-size:18px;font-weight:900;letter-spacing:0.1em;color:var(--text);margin-bottom:6px; }
+    h1 span { color:var(--neon-green);text-shadow:var(--glow-green); }
+    .subtitle { color:var(--text-muted);font-size:13px;margin-bottom:24px; }
+
+    .games-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px; }
+    .game-card {
+      background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);
+      padding:22px;text-decoration:none;display:block;transition:border-color var(--transition), transform var(--transition);
+    }
+    .game-card:hover { border-color:var(--border-hot);transform:translateY(-3px); }
+    .game-card .emoji { font-size:2rem; }
+    .game-card h2 { font-family:var(--font-head);font-size:14px;color:var(--neon-green);margin:10px 0 6px;letter-spacing:0.05em; }
+    .game-card p { color:var(--text-muted);font-size:12.5px;line-height:1.5; }
+    .game-card .tag { display:inline-block;margin-top:12px;font-family:var(--font-mono);font-size:10px;background:rgba(0,255,200,0.08);border:1px solid rgba(0,255,200,0.2);color:var(--neon-green);padding:3px 10px;border-radius:100px; }
+    .game-card.soon { opacity:0.55; pointer-events:none; }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <header class="topbar">
+    <div class="topbar-logo">🎮 INSERT COIN</div>
+    <div class="topbar-nav">
+      <a class="btn btn-ghost" href="home.html" style="padding:6px 14px;font-size:10px;">← FEED</a>
+    </div>
+  </header>
+
+  <div class="page-wrap">
+    <h1>🕹️ <span>Jogos</span></h1>
+    <p class="subtitle">Chame a squad e joga online, sem sair do Insert Coin.</p>
+
+    <div class="games-grid">
+      <a class="game-card" href="numero.html">
+        <div class="emoji">🎲</div>
+        <h2>QUAL É A NOTA?</h2>
+        <p>Sorteie um número secreto e responda perguntas sem se entregar. A galera tenta adivinhar.</p>
+        <span class="tag">Online · 3+ jogadores</span>
+      </a>
+
+      <a class="game-card soon" href="#">
+        <div class="emoji">🔍</div>
+        <h2>FIND IT!</h2>
+        <p>Estilo Dobble — ache o símbolo em comum antes de todo mundo.</p>
+        <span class="tag">Em breve aqui dentro</span>
+      </a>
+
+      <a class="game-card soon" href="#">
+        <div class="emoji">🏈</div>
+        <h2>ARENA DISC FOOTBALL</h2>
+        <p>Futebol americano de mesa, multiplayer em tempo real.</p>
+        <span class="tag">Em breve aqui dentro</span>
+      </a>
+    </div>
+  </div>
+</body>
+</html>

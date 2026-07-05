@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Insert Coin — Qual é a Nota?</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
+  <style>
+    body { background: var(--bg); }
+    .bg-grid { position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,200,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,200,0.025) 1px,transparent 1px);background-size:50px 50px;pointer-events:none; }
+    .topbar { position:sticky;top:0;z-index:100;background:rgba(5,5,16,0.92);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;gap:16px; }
+    .topbar-logo { font-family:var(--font-head);font-size:16px;font-weight:900;letter-spacing:0.1em;color:var(--neon-green);text-shadow:var(--glow-green); }
+
+    .page-wrap { max-width:640px;margin:0 auto;padding:24px 20px;position:relative;z-index:1; }
+    h1 { font-family:var(--font-head);font-size:16px;font-weight:900;letter-spacing:0.08em;color:var(--text);margin-bottom:6px; }
+    h1 span { color:var(--neon-green);text-shadow:var(--glow-green); }
+    .subtitle { color:var(--text-muted);font-size:12.5px;margin-bottom:20px; }
+
+    .card { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;margin-bottom:16px; }
+    input, textarea, select { width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:10px 12px;font-family:var(--font-body);font-size:14px;margin-top:8px; }
+    label { font-family:var(--font-head);font-size:10px;letter-spacing:0.05em;color:var(--text-muted); }
+    .row { display:flex;gap:10px; }
+    .row > * { flex:1; }
+
+    .room-code { font-family:var(--font-mono);font-size:1.8rem;letter-spacing:6px;text-align:center;color:var(--neon-green);text-shadow:var(--glow-green);margin:10px 0; }
+    .player-list { list-style:none;margin-top:10px; }
+    .player-list li { display:flex;justify-content:space-between;padding:8px 12px;background:var(--bg-card2);border-radius:var(--radius);margin-bottom:6px;font-size:13px; }
+    .player-list .score { color:var(--neon-green);font-family:var(--font-mono); }
+    .badge-host { background:rgba(255,44,240,0.12);border:1px solid rgba(255,44,240,0.3);color:var(--neon-pink);font-size:9px;padding:1px 8px;border-radius:100px;margin-left:6px; }
+
+    .number-display { font-size:3.4rem;text-align:center;font-weight:900;color:var(--neon-green);text-shadow:var(--glow-green);font-family:var(--font-head);margin:6px 0; }
+    .question-block { background:var(--bg-card2);border-radius:var(--radius);padding:12px;margin-bottom:10px; }
+    .question-block .q { color:var(--text-muted);font-size:12px; }
+    .question-block .a { margin-top:6px;font-size:13.5px; }
+    .guess-grid { display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:14px 0; }
+    .guess-grid button { padding:10px 0; }
+    .status-tag { font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-bottom:12px; }
+    .hidden { display:none !important; }
+    .err { color:#ff3355;font-size:12px;margin-top:8px; }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <header class="topbar">
+    <div class="topbar-logo">🎮 INSERT COIN</div>
+    <a class="btn btn-ghost" href="games.html" style="padding:6px 14px;font-size:10px;">← JOGOS</a>
+  </header>
+
+  <div class="page-wrap">
+    <h1>🎲 <span>QUAL É A NOTA?</span></h1>
+    <p class="subtitle">Sorteie um número, responda perguntas, engane a galera.</p>
+
+    <!-- ENTRADA -->
+    <div id="screen-entry">
+      <div class="card">
+        <label>CRIAR SALA</label>
+        <select id="squad-select"><option value="">— Sem squad (sala manual) —</option></select>
+        <button class="btn btn-primary" id="btn-create" style="margin-top:12px;">▶ CRIAR SALA</button>
+      </div>
+      <div class="card">
+        <label>ENTRAR COM CÓDIGO</label>
+        <input id="join-code" placeholder="Ex: AB3X9" maxlength="5" style="text-transform:uppercase" />
+        <button class="btn btn-ghost" id="btn-join" style="margin-top:12px;">ENTRAR NA SALA</button>
+      </div>
+      <p class="err" id="entry-error"></p>
+    </div>
+
+    <!-- LOBBY -->
+    <div id="screen-lobby" class="hidden">
+      <div class="card">
+        <label>CÓDIGO DA SALA</label>
+        <div class="room-code" id="lobby-code">-----</div>
+        <ul class="player-list" id="lobby-players"></ul>
+        <button class="btn btn-primary" id="btn-start" style="margin-top:12px;display:none;">INICIAR JOGO</button>
+        <p class="status-tag" id="lobby-wait">Aguardando o anfitrião iniciar...</p>
+      </div>
+    </div>
+
+    <!-- JOGO -->
+    <div id="screen-game" class="hidden">
+      <div class="card">
+        <div class="status-tag" id="game-status"></div>
+
+        <div id="drawer-number-box" class="hidden">
+          <p class="subtitle" style="margin-bottom:0;">Seu número secreto:</p>
+          <div class="number-display" id="my-secret-number"></div>
+        </div>
+
+        <div id="questions-area"></div>
+
+        <div id="ask-box" class="hidden">
+          <textarea id="ask-input" placeholder="Digite sua pergunta..." rows="2"></textarea>
+          <button class="btn btn-primary" id="btn-ask" style="margin-top:8px;">ENVIAR PERGUNTA</button>
+        </div>
+
+        <div id="answer-box" class="hidden">
+          <textarea id="answer-input" placeholder="Sua resposta..." rows="2"></textarea>
+          <button class="btn btn-primary" id="btn-answer" style="margin-top:8px;">RESPONDER</button>
+        </div>
+
+        <div id="guess-box" class="hidden">
+          <p class="subtitle" style="margin-bottom:0;">Qual número você acha que foi sorteado?</p>
+          <div class="guess-grid" id="guess-grid"></div>
+        </div>
+
+        <button class="btn btn-primary" id="btn-reveal" style="display:none;">REVELAR NÚMERO</button>
+        <button class="btn btn-primary" id="btn-next-round" style="display:none;">PRÓXIMA RODADA</button>
+      </div>
+
+      <div class="card">
+        <label>PLACAR</label>
+        <ul class="player-list" id="game-scores"></ul>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="numero.js"></script>
+</body>
+</html>
