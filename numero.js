@@ -16,8 +16,8 @@ import {
 import { db } from "./firebase-config.js";
 
 const $ = (id) => document.getElementById(id);
-const show = (el) => el.classList ? el.classList.remove("hidden") : (el.style.display = "");
-const hide = (el) => el.classList ? el.classList.add("hidden") : (el.style.display = "none");
+const show = (el) => { el.style.display = ""; el.classList.remove("hidden"); };
+const hide = (el) => { el.style.display = "none"; el.classList.add("hidden"); };
 
 const user = await requireAuth("index.html");
 const profile = await getUserProfile(user.uid);
