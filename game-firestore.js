@@ -80,6 +80,10 @@ export async function joinGameRoomByCode(code, uid, nickname) {
   if (!roomDoc) throw new Error("Sala não encontrada.");
   if (roomDoc.data().status !== "lobby") throw new Error("Essa sala já começou.");
 
+  const playersSnap = await getDocs(collection(db, "gameRooms", roomDoc.id, "players"));
+  const alreadyIn = playersSnap.docs.some(p => p.id === uid);
+  if (!alreadyIn && playersSnap.size >= 10) throw new Error("Sala cheia (máximo de 10 jogadores).");
+
   await setDoc(doc(db, "gameRooms", roomDoc.id, "players", uid), {
     nickname,
     score: 0,
