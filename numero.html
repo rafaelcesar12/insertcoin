@@ -20,24 +20,36 @@
     .card { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;margin-bottom:16px; }
     input, textarea, select { width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:10px 12px;font-family:var(--font-body);font-size:14px;margin-top:8px; }
     label { font-family:var(--font-head);font-size:10px;letter-spacing:0.05em;color:var(--text-muted); }
-    .row { display:flex;gap:10px; }
+    .row { display:flex;gap:10px;align-items:center; }
     .row > * { flex:1; }
 
     .room-code { font-family:var(--font-mono);font-size:1.8rem;letter-spacing:6px;text-align:center;color:var(--neon-green);text-shadow:var(--glow-green);margin:10px 0; }
     .player-list { list-style:none;margin-top:10px; }
-    .player-list li { display:flex;justify-content:space-between;padding:8px 12px;background:var(--bg-card2);border-radius:var(--radius);margin-bottom:6px;font-size:13px; }
+    .player-list li { display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg-card2);border-radius:var(--radius);margin-bottom:6px;font-size:13px; }
     .player-list .score { color:var(--neon-green);font-family:var(--font-mono); }
     .badge-host { background:rgba(255,44,240,0.12);border:1px solid rgba(255,44,240,0.3);color:var(--neon-pink);font-size:9px;padding:1px 8px;border-radius:100px;margin-left:6px; }
+    .badge-off { background:rgba(255,51,85,0.1);border:1px solid rgba(255,51,85,0.3);color:#ff3355;font-size:9px;padding:1px 8px;border-radius:100px;margin-left:6px; }
 
     .number-display { font-size:3.4rem;text-align:center;font-weight:900;color:var(--neon-green);text-shadow:var(--glow-green);font-family:var(--font-head);margin:6px 0; }
-    .question-block { background:var(--bg-card2);border-radius:var(--radius);padding:12px;margin-bottom:10px; }
-    .question-block .q { color:var(--text-muted);font-size:12px; }
-    .question-block .a { margin-top:6px;font-size:13.5px; }
+
+    .status-tag { font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-bottom:4px; }
+    .turn-timer { font-family:var(--font-head);font-size:22px;text-align:center;color:var(--neon-blue);margin-bottom:14px; }
+
+    .theme-box { text-align:center;background:var(--bg-card2);border:1px solid var(--border-hot);border-radius:var(--radius-lg);padding:24px;margin-bottom:14px; }
+    .theme-text { font-family:var(--font-head);font-size:1.4rem;color:var(--neon-green);text-shadow:var(--glow-green);margin-bottom:6px; }
+    .theme-sub { color:var(--text-muted);font-size:12.5px; }
+
+    .answer-turn-box { text-align:center;background:rgba(255,44,240,0.06);border:1px solid rgba(255,44,240,0.25);border-radius:var(--radius-lg);padding:24px;margin-bottom:14px; }
+    .answer-turn-text { font-family:var(--font-head);font-size:1.1rem;color:var(--neon-pink); }
+
+    .waiting-box { text-align:center;color:var(--text-muted);font-size:13px;padding:20px;margin-bottom:14px; }
+
     .guess-grid { display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:14px 0; }
     .guess-grid button { padding:10px 0; }
-    .status-tag { font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-bottom:12px; }
     .hidden { display:none !important; }
     .err { color:#ff3355;font-size:12px;margin-top:8px; }
+
+    .btn-skip-wrap { text-align:center;margin-top:10px; }
   </style>
 </head>
 <body>
@@ -81,35 +93,41 @@
     <div id="screen-game" class="hidden">
       <div class="card">
         <div class="status-tag" id="game-status"></div>
+        <div class="turn-timer" id="turn-timer"></div>
 
-        <div id="drawer-number-box" class="hidden">
-          <p class="subtitle" style="margin-bottom:0;">Seu número secreto:</p>
+        <div id="drawer-number-box" class="hidden" style="text-align:center;">
+          <p class="subtitle" id="secret-label" style="margin-bottom:0;">Seu número secreto:</p>
           <div class="number-display" id="my-secret-number"></div>
         </div>
 
-        <div id="questions-area"></div>
-
-        <div id="ask-box" class="hidden">
-          <textarea id="ask-input" placeholder="Digite sua pergunta..." rows="2"></textarea>
-          <button class="btn btn-primary" id="btn-ask" style="margin-top:8px;">ENVIAR PERGUNTA</button>
+        <div id="theme-box" class="theme-box hidden">
+          <div class="theme-text" id="theme-text"></div>
+          <div class="theme-sub" id="theme-sub"></div>
         </div>
 
-        <div id="answer-box" class="hidden">
-          <textarea id="answer-input" placeholder="Sua resposta..." rows="2"></textarea>
-          <button class="btn btn-primary" id="btn-answer" style="margin-top:8px;">RESPONDER</button>
+        <div id="answer-turn-box" class="answer-turn-box hidden">
+          <div class="answer-turn-text" id="answer-turn-text"></div>
+        </div>
+
+        <div id="waiting-box" class="waiting-box hidden">
+          <p id="waiting-text"></p>
         </div>
 
         <div id="guess-box" class="hidden">
-          <p class="subtitle" style="margin-bottom:0;">Qual número você acha que foi sorteado?</p>
+          <p class="subtitle" style="margin-bottom:0;text-align:center;">Qual número você acha que foi sorteado?</p>
           <div class="guess-grid" id="guess-grid"></div>
         </div>
 
-        <button class="btn btn-primary" id="btn-reveal" style="display:none;">REVELAR NÚMERO</button>
-        <button class="btn btn-primary" id="btn-next-round" style="display:none;">PRÓXIMA RODADA</button>
+        <div class="btn-skip-wrap">
+          <button class="btn btn-ghost" id="btn-skip" style="display:none;padding:6px 16px;font-size:11px;">⏭️ PULAR TURNO</button>
+        </div>
+
+        <button class="btn btn-primary" id="btn-reveal" style="display:none;margin-top:10px;">REVELAR NÚMERO</button>
+        <button class="btn btn-primary" id="btn-next-round" style="display:none;margin-top:10px;">PRÓXIMA RODADA</button>
       </div>
 
       <div class="card">
-        <label>PLACAR</label>
+        <label>🏆 RANKING</label>
         <ul class="player-list" id="game-scores"></ul>
       </div>
     </div>

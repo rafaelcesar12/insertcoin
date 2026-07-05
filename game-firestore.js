@@ -1,6 +1,5 @@
 // =============================================
-// INSERT COIN — Jogo do Número ("Qual é a Nota?")
-// Firestore Helpers — mesmo estilo de firestore.js
+// INSERT COIN — Qual é a Nota? — Firestore Helpers v2
 // =============================================
 
 import { db } from "./firebase-config.js";
@@ -8,11 +7,33 @@ import {
   doc, setDoc, getDoc, updateDoc,
   collection, addDoc, query, orderBy,
   getDocs, serverTimestamp, increment,
-  onSnapshot, runTransaction, writeBatch
+  onSnapshot, runTransaction, writeBatch, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { addXP } from "./firestore.js";
 
-// ── CÓDIGO DE SALA ────────────────────────────
+// ── CONFIG ──────────────────────────────────────
+export const TURN_SECONDS = 40;
+export const PRESENCE_STALE_MS = 20000; // 20s sem "ping" = considerado offline
+export const PRESENCE_PING_MS = 8000;   // manda ping a cada 8s
+
+export const THEMES = [
+  "🧑 Vida pessoal",
+  "⚽ Copa do Mundo",
+  "🏀 Outro esporte"
+];
+
+function randomTheme() {
+  return THEMES[Math.floor(Math.random() * THEMES.length)];
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 function generateRoomCode() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -25,12 +46,12 @@ function drawSecretNumber() {
   return Math.floor(Math.random() * 11); // 0 a 10
 }
 
+function deadlineIn(seconds) {
+  return Timestamp.fromMillis(Date.now() + seconds * 1000);
+}
+
 // ── CRIAR / ENTRAR EM SALA ─────────────────────
 
-/**
- * Cria uma sala. Se squadId for passado, todos os membros do squad
- * já entram automaticamente como jogadores.
- */
 export async function createGameRoom(hostUid, hostNickname, squadId = null) {
   const code = generateRoomCode();
   const roomRef = await addDoc(collection(db, "gameRooms"), {
@@ -47,10 +68,10 @@ export async function createGameRoom(hostUid, hostNickname, squadId = null) {
     nickname: hostNickname,
     score: 0,
     isHost: true,
-    joinedAt: serverTimestamp()
+    joinedAt: serverTimestamp(),
+    lastPing: serverTimestamp()
   });
 
-  // Se veio de um squad, adiciona os outros membros automaticamente
   if (squadId) {
     const squadSnap = await getDoc(doc(db, "squads", squadId));
     if (squadSnap.exists()) {
@@ -63,7 +84,8 @@ export async function createGameRoom(hostUid, hostNickname, squadId = null) {
           nickname: nicknames[i] || "Jogador",
           score: 0,
           isHost: false,
-          joinedAt: serverTimestamp()
+          joinedAt: serverTimestamp(),
+          lastPing: serverTimestamp()
         });
       }
     }
@@ -72,10 +94,8 @@ export async function createGameRoom(hostUid, hostNickname, squadId = null) {
   return { roomId: roomRef.id, roomCode: code };
 }
 
-/** Entrada manual por código (pra quem não veio de squad) */
 export async function joinGameRoomByCode(code, uid, nickname) {
-  const q = query(collection(db, "gameRooms"));
-  const snap = await getDocs(q);
+  const snap = await getDocs(query(collection(db, "gameRooms")));
   const roomDoc = snap.docs.find(d => d.data().code === code.trim().toUpperCase());
   if (!roomDoc) throw new Error("Sala não encontrada.");
   if (roomDoc.data().status !== "lobby") throw new Error("Essa sala já começou.");
@@ -88,10 +108,41 @@ export async function joinGameRoomByCode(code, uid, nickname) {
     nickname,
     score: 0,
     isHost: false,
-    joinedAt: serverTimestamp()
+    joinedAt: serverTimestamp(),
+    lastPing: serverTimestamp()
   }, { merge: true });
 
   return { roomId: roomDoc.id, roomCode: roomDoc.data().code };
+}
+
+// ── PRESENÇA ────────────────────────────────────
+
+export async function sendPresencePing(roomId, uid) {
+  await updateDoc(doc(db, "gameRooms", roomId, "players", uid), {
+    lastPing: serverTimestamp()
+  }).catch(() => {});
+}
+
+export function isPlayerOnline(player) {
+  if (!player?.lastPing) return false;
+  const ms = player.lastPing.toMillis ? player.lastPing.toMillis() : player.lastPing;
+  return Date.now() - ms < PRESENCE_STALE_MS;
+}
+
+/** Qualquer cliente pode chamar; só o eleito de fato escreve (ver numero.js) */
+export async function takeOverHost(roomId, newHostUid, newHostNickname) {
+  await updateDoc(doc(db, "gameRooms", roomId), {
+    hostUid: newHostUid,
+    hostNickname: newHostNickname
+  });
+}
+
+// ── NOME DENTRO DO JOGO ─────────────────────────
+
+export async function updateMyGameNickname(roomId, uid, nickname) {
+  await updateDoc(doc(db, "gameRooms", roomId, "players", uid), {
+    nickname: nickname.trim()
+  });
 }
 
 // ── LISTENERS EM TEMPO REAL ────────────────────
@@ -115,16 +166,6 @@ export function listenRound(roomId, roundId, callback) {
   });
 }
 
-export function listenQuestions(roomId, roundId, callback) {
-  const q = query(
-    collection(db, "gameRooms", roomId, "rounds", roundId, "questions"),
-    orderBy("orderIndex")
-  );
-  return onSnapshot(q, (snap) => {
-    callback(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-  });
-}
-
 export function listenGuesses(roomId, roundId, callback) {
   const q = query(collection(db, "gameRooms", roomId, "rounds", roundId, "guesses"));
   return onSnapshot(q, (snap) => {
@@ -134,13 +175,27 @@ export function listenGuesses(roomId, roundId, callback) {
 
 // ── RODADAS ─────────────────────────────────────
 
-/** Só o host chama. Sorteia número e define o próximo jogador por rotação. */
-export async function startGameRound(roomId, players) {
-  if (players.length < 3) throw new Error("Precisa de pelo menos 3 jogadores.");
+/**
+ * Sorteia o próximo "sorteado" aleatoriamente (evita repetir o mesmo
+ * de imediato quando há mais de 1 jogador), sorteia o número secreto,
+ * e monta a ordem de perguntas (embaralhada) dos demais jogadores.
+ */
+export async function startGameRound(roomId, players, previousDrawerUid = null) {
+  const onlinePlayers = players.filter(isPlayerOnline);
+  const pool = onlinePlayers.length >= 3 ? onlinePlayers : players;
+  if (pool.length < 3) throw new Error("Precisa de pelo menos 3 jogadores online.");
+
+  let candidates = pool;
+  if (previousDrawerUid && pool.length > 1) {
+    const filtered = pool.filter(p => p.uid !== previousDrawerUid);
+    if (filtered.length > 0) candidates = filtered;
+  }
+  const drawer = candidates[Math.floor(Math.random() * candidates.length)];
+  const others = pool.filter(p => p.uid !== drawer.uid);
+  const askOrder = shuffle(others).map(p => p.uid);
 
   const roundsSnap = await getDocs(collection(db, "gameRooms", roomId, "rounds"));
   const roundNumber = roundsSnap.size + 1;
-  const drawer = players[(roundNumber - 1) % players.length];
   const secretNumber = drawSecretNumber();
 
   const roundRef = await addDoc(collection(db, "gameRooms", roomId, "rounds"), {
@@ -148,11 +203,14 @@ export async function startGameRound(roomId, players) {
     drawerUid: drawer.uid,
     drawerNickname: drawer.nickname,
     status: "asking",
+    askOrder,
+    currentQuestionIndex: 1,
+    currentAskerUid: askOrder[0],
+    theme: randomTheme(),
+    phaseDeadline: deadlineIn(TURN_SECONDS),
     createdAt: serverTimestamp()
   });
 
-  // Número fica numa subcoleção separada, protegida por regra de segurança:
-  // só o próprio sorteado lê antes da revelação.
   await setDoc(doc(db, "gameRooms", roomId, "rounds", roundRef.id, "secret", "value"), {
     secretNumber
   });
@@ -165,26 +223,40 @@ export async function startGameRound(roomId, players) {
   return roundRef.id;
 }
 
-/** Só quem foi sorteado consegue de fato ler isso (ver regras do Firestore) */
 export async function getSecretNumber(roomId, roundId) {
   const snap = await getDoc(doc(db, "gameRooms", roomId, "rounds", roundId, "secret", "value"));
   return snap.exists() ? snap.data().secretNumber : null;
 }
 
-export async function askQuestion(roomId, roundId, askerUid, askerNickname, questionText, orderIndex) {
-  await addDoc(collection(db, "gameRooms", roomId, "rounds", roundId, "questions"), {
-    askerUid,
-    askerNickname,
-    questionText: questionText.trim(),
-    answerText: null,
-    orderIndex,
-    createdAt: serverTimestamp()
-  });
-}
+/**
+ * Avança o turno: de "asking" -> "answering", ou de "answering" ->
+ * próxima pergunta (asking) ou -> "guessing" se acabaram as perguntas.
+ * Protegido por transação: pode ser chamado por qualquer jogador
+ * (botão manual ou timeout automático) sem risco de pular 2x.
+ */
+export async function advanceTurn(roomId, roundId) {
+  const roundRef = doc(db, "gameRooms", roomId, "rounds", roundId);
+  await runTransaction(db, async (tx) => {
+    const snap = await tx.get(roundRef);
+    if (!snap.exists()) return;
+    const r = snap.data();
 
-export async function answerQuestion(roomId, roundId, questionId, answerText) {
-  await updateDoc(doc(db, "gameRooms", roomId, "rounds", roundId, "questions", questionId), {
-    answerText: answerText.trim()
+    if (r.status === "asking") {
+      tx.update(roundRef, { status: "answering", phaseDeadline: deadlineIn(TURN_SECONDS) });
+    } else if (r.status === "answering") {
+      const nextIndex = r.currentQuestionIndex + 1;
+      if (nextIndex > r.askOrder.length) {
+        tx.update(roundRef, { status: "guessing", currentAskerUid: null, theme: null });
+      } else {
+        tx.update(roundRef, {
+          status: "asking",
+          currentQuestionIndex: nextIndex,
+          currentAskerUid: r.askOrder[nextIndex - 1],
+          theme: randomTheme(),
+          phaseDeadline: deadlineIn(TURN_SECONDS)
+        });
+      }
+    }
   });
 }
 
@@ -197,10 +269,10 @@ export async function submitGuess(roomId, roundId, uid, guessNumber) {
 }
 
 /**
- * Só o host chama. Calcula pontos e atualiza o placar.
- * OBS: assim como o resto do Insert Coin (XP, squads), essa pontuação
- * é calculada no client — não há Cloud Function validando o resultado.
- * Combina com o nível de confiança já usado no restante do app.
+ * Regras de pontuação:
+ * - Cada jogador que acertar o número exato ganha 1 ponto.
+ * - Errar não ganha nem perde ponto.
+ * - Quem pegou o número ganha 3 pontos SE TODOS os palpites acertarem.
  */
 export async function revealRound(roomId, roundId) {
   const secretNumber = await getSecretNumber(roomId, roundId);
@@ -209,34 +281,27 @@ export async function revealRound(roomId, roundId) {
   const drawerUid = roundSnap.data().drawerUid;
 
   const batch = writeBatch(db);
-  let ninguemChegouPerto = true;
+  let allCorrect = guessesSnap.size > 0;
 
   guessesSnap.forEach((g) => {
-    const diff = Math.abs(g.data().guessNumber - secretNumber);
-    const points = diff === 0 ? 3 : diff === 1 ? 1 : 0;
-    if (diff <= 1) ninguemChegouPerto = false;
-
-    batch.update(g.ref, { pointsAwarded: points });
-    if (points > 0) {
-      batch.update(doc(db, "gameRooms", roomId, "players", g.id), {
-        score: increment(points)
-      });
+    const correct = g.data().guessNumber === secretNumber;
+    if (!correct) allCorrect = false;
+    batch.update(g.ref, { pointsAwarded: correct ? 1 : 0 });
+    if (correct) {
+      batch.update(doc(db, "gameRooms", roomId, "players", g.id), { score: increment(1) });
     }
   });
 
-  if (ninguemChegouPerto && guessesSnap.size > 0) {
-    batch.update(doc(db, "gameRooms", roomId, "players", drawerUid), {
-      score: increment(2)
-    });
+  if (allCorrect) {
+    batch.update(doc(db, "gameRooms", roomId, "players", drawerUid), { score: increment(3) });
   }
 
   batch.update(doc(db, "gameRooms", roomId, "rounds", roundId), { status: "revealed" });
   await batch.commit();
 
-  return secretNumber;
+  return { secretNumber, drawerUid };
 }
 
-/** Chame depois da revelação, pra dar XP igual o resto do app (post, squad, etc.) */
 export async function giveGameXP(uid, amount) {
   return addXP(uid, amount);
 }
