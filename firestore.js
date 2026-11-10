@@ -7,7 +7,7 @@ import {
   doc, setDoc, getDoc, updateDoc, deleteDoc,
   collection, addDoc, query, orderBy, limit,
   getDocs, serverTimestamp, increment,
-  where, arrayUnion, arrayRemove, onSnapshot
+  runTransaction, where, arrayUnion, arrayRemove, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // ── USUÁRIOS ──────────────────────────────────
@@ -206,6 +206,23 @@ export async function getOpenSquads(limitCount = 20) {
   const q = query(collection(db, "squads"), orderBy("createdAt", "desc"), limit(limitCount));
   const snap = await getDocs(q);
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+export async function getSquadMembers(id, uid) {
+  const snap = await getDoc(doc(db, "squads", id));
+  const members = snap.data()?.members || [];
+  if (!members.includes(uid)) throw new Error("Você precisa participar deste squad.");
+  return members;
+}
+
+export async function chooseSquadGame(id, uid, compared, game) {
+  const ref = doc(db, "squads", id);
+  await runTransaction(db, async tx => {
+    const squad = (await tx.get(ref)).data();
+    if (squad?.ownerUid !== uid || squad.members.length !== compared.length ||
+        !squad.members.every(member => compared.includes(member))) throw new Error("Squad alterado.");
+    tx.update(ref, { game: game.name, steamAppId: game.appid });
+  });
 }
 
 export async function joinSquad(squadId, uid, nickname) {

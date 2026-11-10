@@ -90,3 +90,11 @@ As notícias são carregadas via **rss2json.com** (serviço gratuito que convert
 - Eventos e eSports
 - Matchmaking por jogos em comum
 - Página de perfil público de outros usuários
+
+## Biblioteca Steam
+
+No projeto Vercel deste site, configure a variável privada `STEAM_WEB_API_KEY` com uma [chave Web API da Steam](https://steamcommunity.com/dev/apikey) e faça um novo deploy. Sirva as páginas e a função `api/steam.js` no mesmo domínio HTTPS. Para desenvolvimento local com a função, use Vercel Dev. O domínio também precisa estar autorizado no Firebase Authentication para o login do site.
+
+No perfil, clique em **Conectar Steam** e confirme sua identidade na Steam. Em Privacidade do perfil Steam, deixe os detalhes de jogos públicos. O InsertCoin consulta a biblioteca ao abrir o perfil ou comparar jogos. O Firebase armazena o vínculo da conta, e os favoritos cadastrados à mão continuam separados. Se a chave Steam for substituída, os usuários devem desconectar e reconectar.
+
+Em **Amigos**, abra **Perfil e jogos em comum**. Em **Squads**, entre em um grupo e clique em **Jogos que todos têm**. O criador pode escolher um título da lista. A comparação usa a identificação do jogo na Steam e inclui títulos solo. Cada jogo abre sua página na loja para consultar modos de jogo e limites de jogadores.

@@ -150,8 +150,10 @@
         item.querySelector(".add-btn")?.addEventListener("click", async (e) => {
           const uid  = e.currentTarget.dataset.uid;
           const nick = e.currentTarget.dataset.nick;
-          await sendFriendRequest(currentUser.uid, uid).catch(() => {});
-          e.currentTarget.outerHTML = `<span style="color:var(--text-muted);font-size:11px;font-family:var(--font-head);">⏳ Enviado</span>`;
+          const button = e.currentTarget;
+          try { await sendFriendRequest(currentUser.uid, uid); }
+          catch { showToast("Falha ao enviar o pedido.", "error"); return; }
+          button.outerHTML = `<span style="color:var(--text-muted);font-size:11px;font-family:var(--font-head);">⏳ Enviado</span>`;
           showToast(`Pedido enviado para ${nick}!`);
         });
         container.appendChild(item);
@@ -239,6 +241,11 @@
           userProfile = await getUserProfile(currentUser.uid);
           card.remove();
         });
+        const profileLink = document.createElement("a");
+        profileLink.className = "btn btn-ghost";
+        profileLink.href = "profile.html?amigo=" + encodeURIComponent(p.uid);
+        profileLink.textContent = "Perfil e jogos em comum";
+        card.querySelector(".p-actions").prepend(profileLink);
         grid.appendChild(card);
       });
     }

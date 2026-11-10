@@ -5,6 +5,9 @@
 import { requireAuth, logoutUser } from "./auth.js";
 import { getUserProfile, createSquad, getOpenSquads, joinSquad, leaveSquad, deleteSquad } from "./firestore.js";
 
+import { comparison } from "./steam.js";
+import { getSquadMembers, chooseSquadGame } from "./firestore.js";
+
 let currentUser = null;
 let userProfile = null;
 let allSquads   = [];
@@ -112,6 +115,19 @@ function buildSquadCard(squad) {
     } catch (err) { showToast(err.message, "error"); }
   });
 
+  if (isMember) {
+    const panel = document.createElement("section");
+    panel.className = "steam-panel";
+    let participants;
+    comparison(panel, "Jogos que todos têm", async () => {
+      participants = await getSquadMembers(squad.id, currentUser.uid);
+      return participants;
+    }, isOwner ? async game => {
+      await chooseSquadGame(squad.id, currentUser.uid, participants, game);
+      await loadSquads();
+    } : null);
+    card.append(panel);
+  }
   return card;
 }
 
@@ -126,7 +142,7 @@ document.getElementById("btn-create-squad").addEventListener("click", async () =
   errEl.style.display = "none";
 
   if (!name) return showSqError("Digite o nome do squad.");
-  if (!game) return showSqError("Digite o jogo do squad.");
+
 
   const btn     = document.getElementById("btn-create-squad");
   const btnText = document.getElementById("sq-btn-text");
@@ -134,7 +150,7 @@ document.getElementById("btn-create-squad").addEventListener("click", async () =
   btn.disabled = true; btnText.style.display = "none"; spinner.style.display = "block";
 
   try {
-    await createSquad(currentUser.uid, userProfile?.nickname || "?", { name, game, platform, maxPlayers: maxP, description: desc });
+    await createSquad(currentUser.uid, userProfile?.nickname || "?", { name, game: game || "A decidir", platform, maxPlayers: maxP, description: desc });
     showToast(`Squad "${name}" criado! +10 XP 🛡️`);
     document.getElementById("sq-name").value = "";
     document.getElementById("sq-game").value = "";

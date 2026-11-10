@@ -5,6 +5,8 @@
 import { requireAuth, logoutUser } from "./auth.js";
 import { getUserProfile, updateUserProfile } from "./firestore.js";
 
+import { profileLibrary, comparison } from "./steam.js";
+
 let currentUser = null;
 let userProfile = null;
 let selectedPlatform = "";
@@ -12,13 +14,26 @@ const editGames = [];
 
 const user = await requireAuth("index.html");
 currentUser = user;
-userProfile = await getUserProfile(user.uid);
+const ownProfile = await getUserProfile(user.uid);
+const friendId = new URLSearchParams(location.search).get("amigo");
+const visiting = !!friendId && friendId !== user.uid;
+if (visiting && !ownProfile?.friends?.includes(friendId)) {
+  location.replace("friends.html");
+  throw new Error("Amizade indisponível.");
+}
+userProfile = visiting ? await getUserProfile(friendId) : ownProfile;
+if (visiting) {
+  document.querySelector(".edit-section").hidden = true;
+  document.getElementById("p-email").hidden = true;
+  comparison(document.getElementById("steam-common"), "Jogos que temos em comum", () => [user.uid, friendId]);
+}
+if (userProfile) profileLibrary(document.getElementById("steam-library"), userProfile, !visiting);
 
 document.getElementById("page-loading").style.display = "none";
 document.getElementById("profile-wrap").style.display = "flex";
 
 populateProfile();
-populateEditForm();
+if (!visiting) populateEditForm();
 
 // ── DISPLAY ───────────────────────────────────
 function populateProfile() {
@@ -46,7 +61,11 @@ function populateProfile() {
   // Avatar
   const avatarEl = document.getElementById("p-avatar");
   if (avatarUrl) {
-    avatarEl.innerHTML = `<img src="${avatarUrl}" style="width:100%;height:100%;object-fit:cover;" />`;
+    const img = document.createElement("img");
+    img.src = avatarUrl;
+    img.alt = "";
+    img.style.cssText = "width:100%;height:100%;object-fit:cover";
+    avatarEl.replaceChildren(img);
   } else {
     avatarEl.textContent = (nickname || "?")[0].toUpperCase();
   }
