@@ -178,18 +178,19 @@
       .topbar-welcome { display: none; }
     }
   </style>
+  <link rel="stylesheet" href="social.css" />
 </head>
 <body>
   <div class="bg-grid"></div>
 
   <header class="topbar">
-    <div class="topbar-logo">🎮 INSERT COIN</div>
+    <a class="topbar-logo" href="home.html" aria-label="InsertCoin — início"><i class="coin-mark" aria-hidden="true"></i>InsertCoin</a>
     <div class="topbar-welcome hide-mobile">Bem-vindo, <strong id="top-nick">...</strong></div>
     <div class="topbar-right">
       <div class="topbar-date" id="top-date"></div>
-      <a class="btn btn-ghost" href="squads.html" style="padding:6px 12px;font-size:10px;">🛡️ SQUADS</a>
-      <a class="btn btn-ghost" href="profile.html" style="padding:6px 12px;font-size:10px;">👤 PERFIL</a>
-      <button class="btn btn-danger" id="btn-logout" style="padding:6px 12px;font-size:10px;">SAIR</button>
+      <a class="btn btn-ghost" href="squads.html" style="padding:6px 12px;font-size:10px;">Squads</a>
+      <a class="btn btn-ghost" href="profile.html" style="padding:6px 12px;font-size:10px;">Meu perfil</a>
+      <button class="btn btn-danger" id="btn-logout" style="padding:6px 12px;font-size:10px;">Sair</button>
     </div>
   </header>
 
@@ -202,7 +203,7 @@
       <a class="nav-item" href="squads.html"><span class="nav-icon">🛡️</span><span>Squads</span></a>
       <a class="nav-item" href="games.html"><span class="nav-icon">🎲</span><span>Jogos</span></a>
       <a class="nav-item coming-soon" href="#"><span class="nav-icon">🏆</span><span>Eventos</span><span class="coming-pill">EM BREVE</span></a>
-      <a class="nav-item coming-soon" href="#"><span class="nav-icon">🎮</span><span>Biblioteca</span><span class="coming-pill">EM BREVE</span></a>
+      <a class="nav-item" href="profile.html#steam-library"><span class="nav-icon">🎮</span><span>Biblioteca Steam</span></a>
       <a class="nav-item" href="profile.html"><span class="nav-icon">⚙️</span><span>Config</span></a>
       <div id="admin-nav-item" style="display:none">
         <a class="nav-item" href="admin.html" style="color:var(--neon-pink);border-color:rgba(255,44,240,0.2);background:rgba(255,44,240,0.05)"><span class="nav-icon">🔐</span><span>Admin</span></a>
@@ -223,12 +224,11 @@
 
     <!-- MAIN -->
     <main class="main">
-      <div class="ad-block">📢 ESPAÇO PARA ANÚNCIO — PERIFÉRICOS / JOGOS / PATROCINADORES</div>
 
       <!-- Feed tabs -->
       <div class="feed-tabs">
-        <div class="feed-tab active" data-tab="feed">📡 Arena</div>
-        <div class="feed-tab" data-tab="news">📰 Notícias</div>
+        <button class="feed-tab active" data-tab="feed">Feed</button>
+        <button class="feed-tab" data-tab="news">Notícias</button>
       </div>
 
       <!-- FEED TAB -->
@@ -236,7 +236,7 @@
         <div class="composer" id="composer">
           <div class="composer-top">
             <div class="avatar" id="comp-avatar">?</div>
-            <textarea id="post-content" placeholder="No que você está jogando? Compartilhe com a arena... (Ctrl+Enter para postar)"></textarea>
+            <textarea id="post-content" placeholder="O que você está jogando hoje?"></textarea>
           </div>
           <div class="img-preview-wrap" id="img-preview-wrap">
             <img class="img-preview" id="img-preview" src="" alt="preview" />
@@ -249,15 +249,15 @@
               <input type="text" id="post-tag" placeholder="# jogo (ex: CS2)" style="width:130px;font-size:12px;padding:6px 10px;" />
             </div>
             <button class="btn btn-primary" id="btn-post" style="padding:8px 20px;font-size:11px;">
-              <span id="post-text">📡 POSTAR</span>
+              <span id="post-text">Publicar</span>
               <div class="spinner" id="post-spinner" style="display:none"></div>
             </button>
           </div>
         </div>
 
         <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
-          <h2 style="font-family:var(--font-head);font-size:13px;letter-spacing:0.1em;color:var(--text);">🌐 FEED DA ARENA</h2>
-          <button class="btn btn-ghost" id="btn-refresh" style="padding:6px 12px;font-size:10px;">↻ ATUALIZAR</button>
+          <h2 style="font-family:var(--font-head);font-size:13px;letter-spacing:0.1em;color:var(--text);">Publicações</h2>
+          <button class="btn btn-ghost" id="btn-refresh" style="padding:6px 12px;font-size:10px;">Atualizar</button>
         </div>
         <div id="feed-loading" class="feed-loading"><div class="spinner"></div></div>
         <div id="feed-container"></div>
@@ -280,7 +280,6 @@
 
     <!-- SIDEBAR RIGHT -->
     <aside class="sidebar-right">
-      <div class="ad-block">🎮 ANÚNCIO<br><span style="font-size:9px;opacity:0.6">Patrocinado</span></div>
 
       <!-- Friend requests -->
       <div id="friend-reqs-widget" style="display:none">

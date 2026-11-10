@@ -1,0 +1,84 @@
+:root {
+  color-scheme: dark;
+  --bg: #18191a;
+  --bg-card: #242526;
+  --bg-card2: #303133;
+  --bg-input: #383a3d;
+  --text: #e8eaed;
+  --text-muted: #b0b4bb;
+  --border: #3b3d40;
+  --border-hot: #608cbd;
+  --neon-blue: #79b7ff;
+  --neon-green: #79b7ff;
+  --neon-purple: #a4bcee;
+  --neon-pink: #efa5b0;
+  --glow-blue: none;
+  --glow-green: none;
+  --glow-purple: none;
+  --font-body: "Segoe UI", system-ui, sans-serif;
+  --font-head: var(--font-body);
+  --font-mono: var(--font-body);
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+
+body::before, .bg-grid, .orb, .pixel-corner { display: none; }
+.topbar, .mobile-nav { background: var(--bg-card); }
+.topbar-logo, .logo .logo-name {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  color: var(--text); font-size: 23px; font-weight: 750; letter-spacing: -.055em;
+  text-shadow: none; white-space: nowrap;
+}
+.coin-mark {
+  display: inline-grid; place-items: center; flex: none; width: 1.42em; height: 1.42em;
+  border-radius: 50%; background: #337eea; color: white;
+}
+.coin-mark::before {
+  content: ""; width: .59em; height: .73em; border: .12em solid currentColor;
+  border-radius: 50%; transform: rotate(24deg);
+}
+.logo .logo-name { font-size: 38px; }
+.auth-card { background: var(--bg-card); border: 1px solid var(--border); box-shadow: 0 6px 24px #0003; }
+.btn, .nav-item, .feed-tab, .post-action-btn, .widget-title { letter-spacing: normal; text-transform: none; }
+.btn-primary, .btn-primary:hover { background: #216acf; color: white; box-shadow: none; }
+.btn-primary:hover { background: #2d75d8; }
+.btn-ghost, .upload-btn { color: var(--text); background: var(--bg-input); border-color: transparent; }
+.btn-ghost:hover, .upload-btn:hover { background: #484b50; color: white; }
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: 2px solid #89c1ff; outline-offset: 2px;
+}
+.sidebar-left, .sidebar-right { border: 0; }
+.nav-item { font-size: 15px; font-weight: 600; color: var(--text); }
+.nav-item:hover, .post-action-btn:hover { background: var(--bg-card2); border-color: transparent; }
+.nav-item.active { background: #23364c; color: #92c6ff; border-color: transparent; }
+.widget-title { font-size: 16px; font-weight: 650; }
+.widget-title::after { display: none; }
+.online-dot { background: #53bc78; box-shadow: none; }
+.online-nick, .squad-name { font-size: 14px; }
+.sidebar-right .squad-card { background: var(--bg-card); }
+.main { min-width: 0; }
+.feed-tabs { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 0 12px; }
+.feed-tab { flex: 1; background: transparent; border: 0; border-bottom: 3px solid transparent; font-size: 15px; font-weight: 600; padding: 12px; }
+.feed-tab.active { color: var(--neon-blue); border-color: #4897ff; }
+.composer { margin-bottom: 16px; }
+.composer textarea { min-width: 0; min-height: 50px; border-radius: 18px; padding: 13px 16px; font-size: 15px; }
+.composer-bottom { margin-top: 14px; padding: 12px 0 0; border-top: 1px solid var(--border); }
+.post-author { font-size: 15px; color: var(--text); font-weight: 650; }
+.post-time, .comment-time { font-size: 12px; }
+.post-content { font-size: 16px; line-height: 1.5; }
+.post-action-btn { font-size: 14px; }
+.post-action-btn.liked { color: var(--neon-blue); }
+.avatar { background: #345679; color: #e1efff; border-color: #4d6985; box-shadow: none; }
+.profile-banner { background: linear-gradient(120deg,#263850,#375777 52%,#344254); }
+.profile-banner::before { background: none; }
+#steam-library { scroll-margin-top: 70px; }
+@media (min-width: 1101px) {
+  .shell { grid-template-columns: minmax(194px,240px) minmax(0,680px) minmax(220px,280px); gap: 12px; justify-content: center; }
+}
+@media (max-width: 640px) {
+  .topbar { gap: 6px; padding: 0 10px; }
+  .topbar-logo { font-size: 18px; gap: 5px; }
+  .topbar-right { gap: 4px; }
+  .main { padding-inline: 8px; }
+  .mob-nav-item { font-size: 10px; }
+}
