@@ -83,7 +83,7 @@ async function loadFeed() {
     loading.style.display = "none";
 
     if (!posts.length) {
-      container.innerHTML = `<div class="feed-empty"><div class="empty-icon">📡</div><p>Nenhuma transmissão ainda.<br>Seja o primeiro a postar na arena!</p></div>`;
+      container.innerHTML = `<div class="feed-empty"><div class="empty-icon"></div><p>Nenhuma transmissão ainda.<br>Seja o primeiro a postar na arena!</p></div>`;
       return;
     }
     posts.forEach(p => container.appendChild(buildPostCard(p)));
@@ -116,13 +116,13 @@ function buildPostCard(post) {
     ${imgHtml}
     <div class="post-actions">
       <button class="post-action-btn like-btn ${hasLiked ? "liked" : ""}" data-id="${post.id}">
-        ${hasLiked ? "❤️" : "🤍"} <span>${post.likesCount || 0}</span>
+        ${hasLiked ? "" : ""} <span>${post.likesCount || 0}</span>
       </button>
       <button class="post-action-btn comment-btn" data-id="${post.id}">
-        💬 <span>${post.commentsCount || 0}</span>
+         <span>${post.commentsCount || 0}</span>
       </button>
-      ${!isOwner ? `<button class="post-action-btn add-friend-btn" data-uid="${post.authorUid}" data-nick="${escHtml(nick)}">➕ Adicionar</button>` : ""}
-      ${isOwner ? `<button class="post-action-btn delete-btn" data-id="${post.id}" style="margin-left:auto;">🗑️ Deletar</button>` : ""}
+      ${!isOwner ? `<button class="post-action-btn add-friend-btn" data-uid="${post.authorUid}" data-nick="${escHtml(nick)}"> Adicionar</button>` : ""}
+      ${isOwner ? `<button class="post-action-btn delete-btn" data-id="${post.id}" style="margin-left:auto;"> Deletar</button>` : ""}
     </div>
     <div class="comments-section" id="comments-${post.id}">
       <div class="comments-list" id="clist-${post.id}"></div>
@@ -142,7 +142,7 @@ function buildPostCard(post) {
     btn.querySelector("span") || btn;
     countEl.textContent = parseInt(countEl.textContent) + (liked ? -1 : 1);
     btn.textContent = "";
-    btn.innerHTML = `${!liked ? "❤️" : "🤍"} <span>${countEl.textContent}</span>`;
+    btn.innerHTML = `${!liked ? "" : ""} <span>${countEl.textContent}</span>`;
     btn.className = `post-action-btn like-btn ${!liked ? "liked" : ""}`;
     btn.dataset.id = post.id;
 
@@ -178,7 +178,7 @@ function buildPostCard(post) {
       const toNick = e.currentTarget.dataset.nick;
       try {
         await sendFriendRequest(currentUser.uid, toUid);
-        e.currentTarget.textContent = "✅ Enviado";
+        e.currentTarget.textContent = " Enviado";
         e.currentTarget.disabled = true;
         showToast(`Pedido enviado para ${toNick}!`);
       } catch { showToast("Erro ao enviar pedido.", "error"); }
@@ -272,7 +272,7 @@ document.getElementById("btn-post").addEventListener("click", async () => {
     document.getElementById("post-content").value = "";
     document.getElementById("post-tag").value = "";
     selectedFile = null; imgInput.value = ""; imgPreview.src = ""; imgWrap.style.display = "none";
-    showToast("Post publicado! +5 XP 🎮");
+    showToast("Post publicado! +5 XP ");
     userProfile = await getUserProfile(currentUser.uid);
     setSidebarUser();
     await loadFeed();
@@ -317,7 +317,7 @@ async function loadSquadsWidget() {
     if (!squads.length) { widget.innerHTML = `<div style="color:var(--text-muted);font-size:12px;">Nenhum squad aberto.</div>`; return; }
     widget.innerHTML = squads.map(s => `
       <div class="squad-card">
-        <div class="squad-name">🛡️ ${escHtml(s.name)}</div>
+        <div class="squad-name"> ${escHtml(s.name)}</div>
         <div class="squad-meta">
           <span>${escHtml(s.game)} · ${escHtml(s.platform)}</span>
           <span>${s.members?.length || 1}/${s.maxPlayers} vagas</span>
@@ -332,7 +332,7 @@ async function loadSquadsWidget() {
         const name = e.currentTarget.dataset.name;
         try {
           await joinSquad(id, currentUser.uid, userProfile?.nickname || "?");
-          showToast(`Você entrou no squad ${name}! +5 XP 🛡️`);
+          showToast(`Você entrou no squad ${name}! +5 XP `);
           await loadSquadsWidget();
         } catch (err) { showToast(err.message, "error"); }
       });
@@ -360,15 +360,15 @@ async function loadFriendRequests() {
       <div class="avatar" style="width:28px;height:28px;font-size:11px;">${(p.nickname||"?")[0].toUpperCase()}</div>
       <span style="font-size:12px;font-family:var(--font-head);color:var(--text);">${escHtml(p.nickname)}</span>
       <div class="freq-actions">
-        <button class="btn btn-primary accept-req" data-uid="${p.uid}" style="padding:3px 8px;font-size:10px;">✓</button>
-        <button class="btn btn-danger reject-req" data-uid="${p.uid}" style="padding:3px 8px;font-size:10px;">✕</button>
+        <button class="btn btn-primary accept-req" data-uid="${p.uid}" style="padding:3px 8px;font-size:10px;"></button>
+        <button class="btn btn-danger reject-req" data-uid="${p.uid}" style="padding:3px 8px;font-size:10px;"></button>
       </div>
     </div>`).join("");
 
   list.querySelectorAll(".accept-req").forEach(btn => {
     btn.addEventListener("click", async (e) => {
       await acceptFriendRequest(currentUser.uid, e.currentTarget.dataset.uid);
-      showToast("Amizade aceita! +5 XP 👥");
+      showToast("Amizade aceita! +5 XP ");
       userProfile = await getUserProfile(currentUser.uid);
       await loadFriendRequests();
     });

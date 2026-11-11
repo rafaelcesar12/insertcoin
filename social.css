@@ -106,3 +106,14 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 #close-detail { display: block; margin: 0 0 12px auto; }
 #detail-body img { width: 100%; border-radius: 4px; margin-bottom: 12px; }
 #detail-body p { color: var(--text-muted); margin: 8px 0 18px; }
+
+.brand-logo{width:36px;height:36px;object-fit:contain;flex-shrink:0}
+.logo-name .brand-logo{width:100px;height:100px}
+.logo .logo-name{flex-direction:column;gap:12px}
+.platform-icon{width:26px;height:26px;object-fit:contain;display:inline-block;vertical-align:middle;margin-right:6px}
+.p-icon .platform-icon{width:32px;height:32px;margin:0 auto;display:block}
+.platform-badge{display:inline-flex;gap:5px;align-items:center}
+.nav-icon:empty,.emoji:empty,.mni:empty{display:none}
+#people li.speaking{background:#173423;color:#a4efbd;border-radius:6px;padding-inline:8px}
+#people li.speaking::after{content:" · falando";font-size:11px}
+#cameras figure.speaking{outline:2px solid #53bc78;outline-offset:-2px}

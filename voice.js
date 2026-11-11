@@ -13,6 +13,12 @@ let busy = false;
 let allowed = false;
 const media = new Map();
 let watching=null;
+let streamMuted=false;
+el("mute-stream").onclick=()=>{
+  streamMuted=!streamMuted;
+  for(const {player,screenAudio} of media.values())if(screenAudio)player.muted=streamMuted;
+  render();
+};
 el("open-devices").onclick=()=>el("device-dialog").showModal();
 el("close-devices").onclick=()=>el("device-dialog").close();
 function isScreen(pub){return pub.source===Track.Source.ScreenShare || pub.source===Track.Source.ScreenShareAudio;}
@@ -78,6 +84,9 @@ async function settings() {
 
 
 function render() {
+  el("mute-stream").hidden=!watching;
+  el("mute-stream").textContent=streamMuted?"Ouvir transmissão":"Silenciar transmissão";
+  el("mute-stream").setAttribute("aria-pressed",String(streamMuted));
   const connected = room.state === "connected";
   const local = room.localParticipant;
   el("join").disabled = busy || !allowed || room.state !== "disconnected";
@@ -98,6 +107,7 @@ function render() {
   const active = new Set();
   for (const person of people) {
     const entry = document.createElement("li");
+    entry.classList.toggle("speaking",person.isSpeaking);
     entry.textContent = (person.name || "Jogador") + (person === local ? " (você)" : "") + (person.isMicrophoneEnabled ? "" : " · mudo");
     el("people").append(entry);
     if(person.isScreenShareEnabled){
@@ -113,9 +123,14 @@ function render() {
       const track = pub.track;
       if (!track || (isScreen(pub) && watching!==person.identity) || (person === local && track.kind === Track.Kind.Audio)) continue;
       active.add(track);
-      if (media.has(track)) continue;
+      if (media.has(track)) {
+        media.get(track).container.classList.toggle("speaking",pub.source===Track.Source.Camera && person.isSpeaking);
+        continue;
+      }
       const player = track.attach();
       player.autoplay = true;
+      const screenAudio=pub.source===Track.Source.ScreenShareAudio;
+      if(screenAudio)player.muted=streamMuted;
       let container = player;
       if (track.kind === Track.Kind.Video) {
         player.playsInline = true;
@@ -124,10 +139,11 @@ function render() {
         container = document.createElement("figure");
         const caption = document.createElement("figcaption");
         caption.textContent = (pub.source === Track.Source.Camera ? "Webcam de " : "Tela de ") + (person.name || "jogador");
+        container.classList.toggle("speaking",pub.source===Track.Source.Camera && person.isSpeaking);
         container.append(player,caption);
         el(pub.source===Track.Source.Camera ? "cameras" : "screen-stage").append(container);
       } else el("audio").append(player);
-      media.set(track,{player,container});
+      media.set(track,{player,container,screenAudio});
     }
   }
   for (const [track,{player,container}] of media) {
@@ -137,7 +153,7 @@ function render() {
   el("streams").classList.toggle("watching",!!el("screen-stage").querySelector("video"));
 }
 
-for (const event of [RoomEvent.ParticipantConnected,RoomEvent.ParticipantDisconnected,RoomEvent.TrackSubscribed,
+for (const event of [RoomEvent.ActiveSpeakersChanged,RoomEvent.ParticipantConnected,RoomEvent.ParticipantDisconnected,RoomEvent.TrackSubscribed,
   RoomEvent.TrackPublished,RoomEvent.TrackUnpublished,RoomEvent.TrackUnsubscribed,RoomEvent.TrackMuted,RoomEvent.TrackUnmuted,RoomEvent.LocalTrackPublished,
   RoomEvent.LocalTrackUnpublished,RoomEvent.AudioPlaybackStatusChanged]) room.on(event,render);
 room.on(RoomEvent.ParticipantPermissionsChanged,(_previous,participant)=>{

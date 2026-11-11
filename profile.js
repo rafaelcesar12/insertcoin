@@ -56,7 +56,7 @@ function populateProfile() {
 
   // Location
   const parts = [city, state, country].filter(Boolean);
-  document.getElementById("p-location").textContent = parts.length ? `📍 ${parts.join(", ")}` : "";
+  document.getElementById("p-location").textContent = parts.length ? ` ${parts.join(", ")}` : "";
 
   // Avatar
   const avatarEl = document.getElementById("p-avatar");
@@ -88,13 +88,13 @@ function populateProfile() {
   const socialEl = document.getElementById("p-social-links");
   socialEl.innerHTML = "";
   const socials = [
-    { key: "discord",  icon: "💬", label: "Discord",    cls: "social-discord",  prefix: "" },
-    { key: "steam",    icon: "🎮", label: "Steam",      cls: "social-steam",    prefix: "https://steamcommunity.com/id/" },
+    { key: "discord",  icon: "", label: "Discord",    cls: "social-discord",  prefix: "" },
+    { key: "steam",    icon: "", label: "Steam",      cls: "social-steam",    prefix: "https://steamcommunity.com/id/" },
     { key: "epic",     icon: "⬜", label: "Epic",       cls: "social-epic",     prefix: "" },
-    { key: "xbox",     icon: "🟩", label: "Xbox",       cls: "social-xbox",     prefix: "" },
-    { key: "psn",      icon: "🎮", label: "PSN",        cls: "social-psn",      prefix: "" },
-    { key: "twitch",   icon: "🟣", label: "Twitch",     cls: "social-twitch",   prefix: "https://twitch.tv/" },
-    { key: "youtube",  icon: "🔴", label: "YouTube",    cls: "social-youtube",  prefix: "" }
+    { key: "xbox",     icon: "", label: "Xbox",       cls: "social-xbox",     prefix: "" },
+    { key: "psn",      icon: "", label: "PSN",        cls: "social-psn",      prefix: "" },
+    { key: "twitch",   icon: "", label: "Twitch",     cls: "social-twitch",   prefix: "https://twitch.tv/" },
+    { key: "youtube",  icon: "", label: "YouTube",    cls: "social-youtube",  prefix: "" }
   ];
   socials.forEach(s => {
     const val = socialLinks[s.key];
@@ -209,7 +209,7 @@ document.getElementById("btn-save").addEventListener("click", async () => {
     });
     userProfile = await getUserProfile(currentUser.uid);
     populateProfile();
-    showSaveMsg("Perfil atualizado! 🎮", true);
+    showSaveMsg("Perfil atualizado! ", true);
   } catch {
     showSaveMsg("Erro ao salvar. Tente novamente.", false);
   } finally {

@@ -48,7 +48,7 @@ async function loadMySquads() {
   mySquads.forEach(s => {
     const opt = document.createElement("option");
     opt.value = s.id;
-    opt.textContent = `🛡️ ${s.name} (${s.members.length} membros)`;
+    opt.textContent = ` ${s.name} (${s.members.length} membros)`;
     select.appendChild(opt);
   });
 }
@@ -176,7 +176,7 @@ function renderLobbyPlayers(players) {
   $("lobby-players").innerHTML = players.map(p => `
     <li>
       <span>${escHtml(p.nickname)} ${p.isHost ? '<span class="badge-host">HOST</span>' : ''} ${isPlayerOnline(p) ? '' : '<span class="badge-off">offline</span>'}</span>
-      ${p.uid === myUid ? '<button class="btn btn-ghost btn-edit-name" style="padding:2px 8px;font-size:10px;">✏️ nome</button>' : ''}
+      ${p.uid === myUid ? '<button class="btn btn-ghost btn-edit-name" style="padding:2px 8px;font-size:10px;"> nome</button>' : ''}
     </li>
   `).join("");
 
@@ -207,7 +207,7 @@ $("btn-start").addEventListener("click", async () => {
 // ── Render: jogo ────────────────────────────────
 function renderScores(players) {
   const sorted = players.slice().sort((a, b) => b.score - a.score);
-  const medals = ["🥇", "🥈", "🥉"];
+  const medals = ["", "", ""];
   $("game-scores").innerHTML = sorted.map((p, i) => `
     <li>
       <span>${medals[i] || "•"} ${escHtml(p.nickname)} ${isPlayerOnline(p) ? '' : '<span class="badge-off">offline</span>'}</span>
@@ -224,7 +224,7 @@ function renderTimer() {
   }
   const deadlineMs = latestRound.phaseDeadline.toMillis ? latestRound.phaseDeadline.toMillis() : latestRound.phaseDeadline;
   const remaining = Math.max(0, Math.ceil((deadlineMs - Date.now()) / 1000));
-  $("turn-timer").textContent = `⏱️ ${remaining}s`;
+  $("turn-timer").textContent = `⏱ ${remaining}s`;
   $("turn-timer").style.color = remaining <= 10 ? "#ff3355" : "";
 }
 

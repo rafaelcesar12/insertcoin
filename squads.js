@@ -49,7 +49,7 @@ function renderSquads() {
   }
 
   if (!squads.length) {
-    list.innerHTML = `<div class="squad-empty"><div style="font-size:40px;margin-bottom:12px;">🛡️</div><p>Nenhum squad encontrado.<br>Crie o seu!</p></div>`;
+    list.innerHTML = `<div class="squad-empty"><div style="font-size:40px;margin-bottom:12px;"></div><p>Nenhum squad encontrado.<br>Crie o seu!</p></div>`;
     return;
   }
 
@@ -70,7 +70,7 @@ function buildSquadCard(squad) {
   card.innerHTML = `
     <div class="squad-card-head">
       <div>
-        <div class="squad-card-name">🛡️ ${escHtml(squad.name)}</div>
+        <div class="squad-card-name"> ${escHtml(squad.name)}</div>
         <div class="squad-card-owner">Criado por ${escHtml(squad.ownerNickname || "?")} · ${escHtml(squad.game)}</div>
       </div>
       <span class="squad-status ${squad.status}">${squad.status.toUpperCase()}</span>
@@ -86,8 +86,8 @@ function buildSquadCard(squad) {
     <div class="squad-actions">
       ${!isMember && squad.status === "aberto" ? `<button class="btn btn-primary join-btn" data-id="${squad.id}" data-name="${escHtml(squad.name)}" style="padding:8px 16px;font-size:11px;">▶ ENTRAR</button>` : ""}
       ${isMember && !isOwner ? `<button class="btn btn-ghost leave-btn" data-id="${squad.id}" style="padding:8px 16px;font-size:11px;">↩ SAIR</button>` : ""}
-      ${isOwner ? `<button class="btn btn-danger delete-squad-btn" data-id="${squad.id}" style="padding:8px 16px;font-size:11px;">🗑️ DELETAR</button>` : ""}
-      ${isMember ? `<span style="color:var(--neon-green);font-size:12px;font-family:var(--font-head);padding:8px;">✅ Você está neste squad</span>` : ""}
+      ${isOwner ? `<button class="btn btn-danger delete-squad-btn" data-id="${squad.id}" style="padding:8px 16px;font-size:11px;"> DELETAR</button>` : ""}
+      ${isMember ? `<span style="color:var(--neon-green);font-size:12px;font-family:var(--font-head);padding:8px;"> Você está neste squad</span>` : ""}
     </div>`;
 
   card.querySelector(".join-btn")?.addEventListener("click", async (e) => {
@@ -95,7 +95,7 @@ function buildSquadCard(squad) {
     const name = e.currentTarget.dataset.name;
     try {
       await joinSquad(id, currentUser.uid, userProfile?.nickname || "?");
-      showToast(`Você entrou no squad ${name}! +5 XP 🛡️`);
+      showToast(`Você entrou no squad ${name}! +5 XP `);
       await loadSquads();
     } catch (err) { showToast(err.message, "error"); }
   });
@@ -156,7 +156,7 @@ document.getElementById("btn-create-squad").addEventListener("click", async () =
 
   try {
     await createSquad(currentUser.uid, userProfile?.nickname || "?", { name, game: game || "A decidir", platform, maxPlayers: maxP, description: desc });
-    showToast(`Squad "${name}" criado! +10 XP 🛡️`);
+    showToast(`Squad "${name}" criado! +10 XP `);
     document.getElementById("sq-name").value = "";
     document.getElementById("sq-game").value = "";
     document.getElementById("sq-desc").value = "";

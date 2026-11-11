@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Insert Coin — Home</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
+  <link rel="icon" href="assets/brand.png">
   <style>
     body { background: var(--bg); }
     .bg-grid {
@@ -184,7 +184,7 @@
   <div class="bg-grid"></div>
 
   <header class="topbar">
-    <a class="topbar-logo" href="home.html" aria-label="InsertCoin — início"><i class="coin-mark" aria-hidden="true"></i>InsertCoin</a>
+    <a class="topbar-logo" href="home.html" aria-label="InsertCoin — início"><img class="brand-logo" src="assets/brand.png" alt="">InsertCoin</a>
     <div class="topbar-welcome hide-mobile">Bem-vindo, <strong id="top-nick">...</strong></div>
     <div class="topbar-right">
       <div class="topbar-date" id="top-date"></div>
@@ -197,16 +197,16 @@
   <div class="shell">
     <!-- SIDEBAR LEFT -->
     <aside class="sidebar-left">
-      <a class="nav-item active" href="home.html"><span class="nav-icon">📡</span><span>Feed</span></a>
-      <a class="nav-item" href="profile.html"><span class="nav-icon">👤</span><span>Meu Perfil</span></a>
-      <a class="nav-item" href="friends.html"><span class="nav-icon">👥</span><span>Amigos</span><span class="notif-badge" id="req-badge">0</span></a>
-      <a class="nav-item" href="squads.html"><span class="nav-icon">🛡️</span><span>Squads</span></a>
-      <a class="nav-item" href="games.html"><span class="nav-icon">🎲</span><span>Explorar Steam</span></a>
-      <a class="nav-item coming-soon" href="#"><span class="nav-icon">🏆</span><span>Eventos</span><span class="coming-pill">EM BREVE</span></a>
-      <a class="nav-item" href="profile.html#steam-library"><span class="nav-icon">🎮</span><span>Biblioteca Steam</span></a>
-      <a class="nav-item" href="profile.html"><span class="nav-icon">⚙️</span><span>Config</span></a>
+      <a class="nav-item active" href="home.html"><span class="nav-icon"></span><span>Feed</span></a>
+      <a class="nav-item" href="profile.html"><span class="nav-icon"></span><span>Meu Perfil</span></a>
+      <a class="nav-item" href="friends.html"><span class="nav-icon"></span><span>Amigos</span><span class="notif-badge" id="req-badge">0</span></a>
+      <a class="nav-item" href="squads.html"><span class="nav-icon"></span><span>Squads</span></a>
+      <a class="nav-item" href="games.html"><span class="nav-icon"></span><span>Explorar Steam</span></a>
+      <a class="nav-item coming-soon" href="#"><span class="nav-icon"></span><span>Eventos</span><span class="coming-pill">EM BREVE</span></a>
+      <a class="nav-item" href="profile.html#steam-library"><span class="nav-icon"></span><span>Biblioteca Steam</span></a>
+      <a class="nav-item" href="profile.html"><span class="nav-icon"></span><span>Config</span></a>
       <div id="admin-nav-item" style="display:none">
-        <a class="nav-item" href="admin.html" style="color:var(--neon-pink);border-color:rgba(255,44,240,0.2);background:rgba(255,44,240,0.05)"><span class="nav-icon">🔐</span><span>Admin</span></a>
+        <a class="nav-item" href="admin.html" style="color:var(--neon-pink);border-color:rgba(255,44,240,0.2);background:rgba(255,44,240,0.05)"><span class="nav-icon"></span><span>Admin</span></a>
       </div>
 
       <div class="sidebar-user-card" id="sidebar-user">
@@ -244,7 +244,7 @@
           </div>
           <div class="composer-bottom">
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-              <label class="upload-btn" for="post-image-input">📎 Imagem</label>
+              <label class="upload-btn" for="post-image-input"> Imagem</label>
               <input type="file" id="post-image-input" accept="image/*" style="display:none" />
               <input type="text" id="post-tag" placeholder="# jogo (ex: CS2)" style="width:130px;font-size:12px;padding:6px 10px;" />
             </div>
@@ -266,7 +266,7 @@
       <!-- NEWS TAB -->
       <div id="tab-news" style="display:none">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-          <h2 style="font-family:var(--font-head);font-size:13px;letter-spacing:0.1em;color:var(--text);">📰 NOTÍCIAS GAMER</h2>
+          <h2 style="font-family:var(--font-head);font-size:13px;letter-spacing:0.1em;color:var(--text);"> NOTÍCIAS GAMER</h2>
           <div style="display:flex;gap:6px;" id="news-source-btns">
             <button class="btn btn-ghost news-src active" data-src="ign" style="padding:5px 10px;font-size:10px;">IGN BR</button>
             <button class="btn btn-ghost news-src" data-src="theenemy" style="padding:5px 10px;font-size:10px;">The Enemy</button>
@@ -304,14 +304,15 @@
   </div>
 
   <nav class="mobile-nav">
-    <div class="mob-nav-item active" onclick="location.href='home.html'"><span class="mni">📡</span>Feed</div>
-    <div class="mob-nav-item" onclick="location.href='friends.html'"><span class="mni">👥</span>Amigos</div>
-    <div class="mob-nav-item" onclick="location.href='squads.html'"><span class="mni">🛡️</span>Squads</div>
-    <div class="mob-nav-item" onclick="location.href='games.html'"><span class="mni">🎲</span>Jogos</div>
-    <div class="mob-nav-item" onclick="location.href='profile.html'"><span class="mni">👤</span>Perfil</div>
+    <div class="mob-nav-item active" onclick="location.href='home.html'"><span class="mni"></span>Feed</div>
+    <div class="mob-nav-item" onclick="location.href='friends.html'"><span class="mni"></span>Amigos</div>
+    <div class="mob-nav-item" onclick="location.href='squads.html'"><span class="mni"></span>Squads</div>
+    <div class="mob-nav-item" onclick="location.href='games.html'"><span class="mni"></span>Jogos</div>
+    <div class="mob-nav-item" onclick="location.href='profile.html'"><span class="mni"></span>Perfil</div>
   </nav>
 
   <div id="toast-container"></div>
   <script type="module" src="home.js"></script>
+<script type="module" src="branding.js"></script>
 </body>
 </html>

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Insert Coin — Admin</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔐</text></svg>" />
+  <link rel="icon" href="assets/brand.png">
   <style>
     body { background: var(--bg); }
     .bg-grid { position:fixed;inset:0;background-image:linear-gradient(rgba(255,44,240,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,44,240,0.025) 1px,transparent 1px);background-size:50px 50px;pointer-events:none; }
@@ -71,7 +71,7 @@
 <body>
   <div class="bg-grid"></div>
   <header class="topbar">
-    <div class="topbar-logo">🔐 PAINEL ADMIN</div>
+    <a class="topbar-logo" href="home.html"><img class="brand-logo" src="assets/brand.png" alt="">InsertCoin</a>
     <div style="display:flex;gap:8px;">
       <a class="btn btn-ghost" href="home.html" style="padding:6px 14px;font-size:10px;">← FEED</a>
       <button class="btn btn-danger" id="btn-logout" style="padding:6px 14px;font-size:10px;">SAIR</button>
@@ -80,14 +80,14 @@
 
   <!-- ACCESS DENIED (shown until verified) -->
   <div id="access-denied" class="access-denied" style="display:none;position:relative;z-index:1;">
-    <div class="icon">🚫</div>
+    <div class="icon"></div>
     <h2>ACESSO NEGADO</h2>
     <p>Você não tem permissão para acessar esta área.</p>
     <a class="btn btn-outline" href="home.html">Voltar ao Feed</a>
   </div>
 
   <div id="admin-panel" class="page-wrap" style="display:none">
-    <h1>🔐 PAINEL DE <span>ADMINISTRAÇÃO</span></h1>
+    <h1> PAINEL DE <span>ADMINISTRAÇÃO</span></h1>
 
     <!-- Stats -->
     <div class="stats-row">
@@ -222,10 +222,10 @@
           ${isMe ? `<span style="color:var(--text-muted);font-size:11px;">— você mesmo —</span>` : `
           <div class="action-menu">
             ${u.banned
-              ? `<button class="action-btn unban" data-uid="${u.uid}">🔓 Desbanir</button>`
-              : `<button class="action-btn ban" data-uid="${u.uid}">🚫 Banir</button>`}
+              ? `<button class="action-btn unban" data-uid="${u.uid}"> Desbanir</button>`
+              : `<button class="action-btn ban" data-uid="${u.uid}"> Banir</button>`}
             ${u.isAdmin
-              ? `<button class="action-btn demote" data-uid="${u.uid}">👤 Remover Admin</button>`
+              ? `<button class="action-btn demote" data-uid="${u.uid}"> Remover Admin</button>`
               : `<button class="action-btn promote" data-uid="${u.uid}">⭐ Tornar Admin</button>`}
             <div>
               <div class="xp-input-row">
@@ -305,5 +305,6 @@
       return String(str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
     }
   </script>
+<script type="module" src="branding.js"></script>
 </body>
 </html>

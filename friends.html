@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Insert Coin — Amigos</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
+  <link rel="icon" href="assets/brand.png">
   <style>
     body { background: var(--bg); }
     .bg-grid { position:fixed;inset:0;background-image:linear-gradient(rgba(0,224,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,224,255,0.025) 1px,transparent 1px);background-size:60px 60px;pointer-events:none; }
@@ -57,7 +57,7 @@
 <body>
   <div class="bg-grid"></div>
   <header class="topbar">
-    <a class="topbar-logo" href="home.html" aria-label="InsertCoin — início"><i class="coin-mark" aria-hidden="true"></i>InsertCoin</a>
+    <a class="topbar-logo" href="home.html" aria-label="InsertCoin — início"><img class="brand-logo" src="assets/brand.png" alt="">InsertCoin</a>
     <div style="display:flex;gap:8px;">
       <a class="btn btn-ghost" href="home.html" style="padding:6px 14px;font-size:10px;">← FEED</a>
       <button class="btn btn-danger" id="btn-logout" style="padding:6px 14px;font-size:10px;">SAIR</button>
@@ -65,12 +65,12 @@
   </header>
 
   <div class="page-wrap">
-    <h1>👥 <span>AMIGOS</span></h1>
+    <h1> <span>AMIGOS</span></h1>
 
     <!-- Search -->
     <div class="search-bar">
       <input type="text" id="search-input" placeholder="Buscar jogadores pelo nickname..." />
-      <button class="btn btn-primary" id="btn-search" style="padding:10px 20px;font-size:12px;">🔍 BUSCAR</button>
+      <button class="btn btn-primary" id="btn-search" style="padding:10px 20px;font-size:12px;"> BUSCAR</button>
     </div>
     <div id="search-results" class="search-results"></div>
 
@@ -142,10 +142,10 @@
           </div>
           <div>
             ${isFriend
-              ? `<span style="color:var(--neon-green);font-size:11px;font-family:var(--font-head);">✅ Amigo</span>`
+              ? `<span style="color:var(--neon-green);font-size:11px;font-family:var(--font-head);"> Amigo</span>`
               : isPending
               ? `<span style="color:var(--text-muted);font-size:11px;font-family:var(--font-head);">⏳ Pendente</span>`
-              : `<button class="btn btn-outline add-btn" data-uid="${p.uid}" data-nick="${escHtml(p.nickname)}" style="padding:5px 12px;font-size:10px;">➕ Adicionar</button>`
+              : `<button class="btn btn-outline add-btn" data-uid="${p.uid}" data-nick="${escHtml(p.nickname)}" style="padding:5px 12px;font-size:10px;"> Adicionar</button>`
             }
           </div>`;
         item.querySelector(".add-btn")?.addEventListener("click", async (e) => {
@@ -184,12 +184,12 @@
             <div class="p-meta">${escHtml(p.mainPlatform||"")}</div>
           </div>
           <div class="req-actions">
-            <button class="btn btn-primary accept-btn" data-uid="${p.uid}" style="padding:6px 12px;font-size:10px;">✓ Aceitar</button>
-            <button class="btn btn-danger reject-btn" data-uid="${p.uid}" style="padding:6px 12px;font-size:10px;">✕</button>
+            <button class="btn btn-primary accept-btn" data-uid="${p.uid}" style="padding:6px 12px;font-size:10px;"> Aceitar</button>
+            <button class="btn btn-danger reject-btn" data-uid="${p.uid}" style="padding:6px 12px;font-size:10px;"></button>
           </div>`;
         card.querySelector(".accept-btn").addEventListener("click", async (e) => {
           await acceptFriendRequest(currentUser.uid, e.currentTarget.dataset.uid);
-          showToast("Amizade aceita! +5 XP 👥");
+          showToast("Amizade aceita! +5 XP ");
           userProfile = await getUserProfile(currentUser.uid);
           card.remove(); loadFriends();
         });
@@ -229,7 +229,7 @@
             ${p.city ? `· ${escHtml(p.city)}` : ""}
             <br>
             <span style="color:${p.isOnline ? "var(--neon-green)" : "var(--text-muted)"}">
-              ${p.isOnline ? "🟢 Online" : "⚫ Offline"}
+              ${p.isOnline ? " Online" : " Offline"}
             </span>
           </div>
           <div class="p-actions">
@@ -265,5 +265,6 @@
       return String(str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
     }
   </script>
+<script type="module" src="branding.js"></script>
 </body>
 </html>

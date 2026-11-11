@@ -17,9 +17,9 @@ export const PRESENCE_STALE_MS = 20000; // 20s sem "ping" = considerado offline
 export const PRESENCE_PING_MS = 8000;   // manda ping a cada 8s
 
 export const THEMES = [
-  "🧑 Vida pessoal",
-  "⚽ Copa do Mundo",
-  "🏀 Outro esporte"
+  " Vida pessoal",
+  " Copa do Mundo",
+  " Outro esporte"
 ];
 
 function randomTheme() {

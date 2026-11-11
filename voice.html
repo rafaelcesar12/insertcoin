@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Sala de voz · InsertCoin</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="social.css"><link rel="stylesheet" href="voice.css"></head>
-<body><header class="voice-header"><a class="topbar-logo" href="home.html"><i class="coin-mark" aria-hidden="true"></i>InsertCoin</a><a href="squads.html">Voltar aos squads</a></header>
+<body><header class="voice-header"><a class="topbar-logo" href="home.html"><img class="brand-logo" src="assets/brand.png" alt="">InsertCoin</a><a href="squads.html">Voltar aos squads</a></header>
 <main class="voice-layout"><aside><h2 id="squad-name">Squad</h2><p>Canal de voz</p><strong class="channel">◖))　Geral</strong><h3>Na chamada</h3><ul id="people"></ul><h3>Transmissões</h3><div id="broadcasts"></div></aside>
 <section class="voice-stage"><header><h1>Geral</h1><p id="status" role="status">Carregando sala…</p></header>
 <div id="streams"><div id="screen-stage"><p id="empty">Escolha uma transmissão para assistir.</p></div><div id="cameras"></div></div>
-<footer><button id="open-devices" class="btn btn-ghost">⚙ Dispositivos</button><button class="btn btn-primary" id="join" disabled>Entrar na chamada</button><button class="btn btn-ghost" id="mic" disabled>Ativar microfone</button><button class="btn btn-ghost" id="camera" hidden>Ativar webcam</button><button class="btn btn-ghost" id="share" disabled>Compartilhar tela</button><button class="btn btn-ghost" id="switch" hidden>Trocar tela</button><button class="btn btn-ghost" id="listen" hidden>Ouvir chamada</button><button class="btn btn-danger" id="leave" disabled>Sair</button></footer></section></main>
+<footer><button id="mute-stream" class="btn btn-ghost" hidden>Silenciar transmissão</button><button id="open-devices" class="btn btn-ghost"> Dispositivos</button><button class="btn btn-primary" id="join" disabled>Entrar na chamada</button><button class="btn btn-ghost" id="mic" disabled>Ativar microfone</button><button class="btn btn-ghost" id="camera" hidden>Ativar webcam</button><button class="btn btn-ghost" id="share" disabled>Compartilhar tela</button><button class="btn btn-ghost" id="switch" hidden>Trocar tela</button><button class="btn btn-ghost" id="listen" hidden>Ouvir chamada</button><button class="btn btn-danger" id="leave" disabled>Sair</button></footer></section></main>
 <dialog id="device-dialog" class="device-panel"><h2>Dispositivos</h2><button id="close-devices" class="btn btn-ghost">Fechar</button>
 <div class="device-grid">
 <label>Microfone<select id="audioinput"></select></label>
@@ -14,4 +14,5 @@
 </div><label><input type="checkbox" id="noise" checked> Reduzir ruído do microfone</label>
 <button class="btn btn-ghost" id="devices">Identificar dispositivos</button>
 <p id="device-status" role="status"></p></dialog>
-<div id="audio"></div><script type="module" src="voice.js"></script></body></html>
+<div id="audio"></div><script type="module" src="voice.js"></script><script type="module" src="branding.js"></script>
+</body></html>

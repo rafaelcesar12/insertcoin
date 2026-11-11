@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Insert Coin — Qual é a Nota?</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
+  <link rel="icon" href="assets/brand.png">
   <style>
     body { background: var(--bg); }
     .bg-grid { position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,200,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,200,0.025) 1px,transparent 1px);background-size:50px 50px;pointer-events:none; }
@@ -56,12 +56,12 @@
 <body>
   <div class="bg-grid"></div>
   <header class="topbar">
-    <a class="topbar-logo" href="home.html" aria-label="InsertCoin — início"><i class="coin-mark" aria-hidden="true"></i>InsertCoin</a>
+    <a class="topbar-logo" href="home.html" aria-label="InsertCoin — início"><img class="brand-logo" src="assets/brand.png" alt="">InsertCoin</a>
     <a class="btn btn-ghost" href="games.html" style="padding:6px 14px;font-size:10px;">← JOGOS</a>
   </header>
 
   <div class="page-wrap">
-    <h1>🎲 <span>QUAL É A NOTA?</span></h1>
+    <h1> <span>QUAL É A NOTA?</span></h1>
     <p class="subtitle">Sorteie um número, responda perguntas, engane a galera.</p>
 
     <!-- ENTRADA -->
@@ -120,7 +120,7 @@
         </div>
 
         <div class="btn-skip-wrap">
-          <button class="btn btn-ghost" id="btn-skip" style="display:none;padding:6px 16px;font-size:11px;">⏭️ PULAR TURNO</button>
+          <button class="btn btn-ghost" id="btn-skip" style="display:none;padding:6px 16px;font-size:11px;">⏭ PULAR TURNO</button>
         </div>
 
         <button class="btn btn-primary" id="btn-reveal" style="display:none;margin-top:10px;">REVELAR NÚMERO</button>
@@ -128,12 +128,13 @@
       </div>
 
       <div class="card">
-        <label>🏆 RANKING</label>
+        <label> RANKING</label>
         <ul class="player-list" id="game-scores"></ul>
       </div>
     </div>
   </div>
 
   <script type="module" src="numero.js"></script>
+<script type="module" src="branding.js"></script>
 </body>
 </html>

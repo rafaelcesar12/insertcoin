@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Insert Coin — Perfil</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
+  <link rel="icon" href="assets/brand.png">
   <style>
     body { background: var(--bg); min-height: 100vh; }
     .bg-grid { position:fixed;inset:0;background-image:linear-gradient(rgba(123,44,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(123,44,255,0.025) 1px,transparent 1px);background-size:50px 50px;pointer-events:none; }
@@ -91,7 +91,7 @@
 <body>
   <div class="bg-grid"></div>
   <header class="topbar">
-    <a class="topbar-logo" href="home.html" aria-label="InsertCoin — início"><i class="coin-mark" aria-hidden="true"></i>InsertCoin</a>
+    <a class="topbar-logo" href="home.html" aria-label="InsertCoin — início"><img class="brand-logo" src="assets/brand.png" alt="">InsertCoin</a>
     <div style="display:flex;gap:8px;">
       <a class="btn btn-ghost" href="home.html" style="padding:6px 14px;font-size:10px;">← FEED</a>
       <button class="btn btn-danger" id="btn-logout" style="padding:6px 14px;font-size:10px;">SAIR</button>
@@ -178,11 +178,11 @@
       <div class="form-group" style="margin-bottom:16px;">
         <label>Plataforma Principal</label>
         <div class="platform-grid">
-          <div class="platform-btn" data-platform="PC"><span class="p-icon">🖥️</span>PC</div>
-          <div class="platform-btn" data-platform="PlayStation"><span class="p-icon">🎮</span>PS</div>
-          <div class="platform-btn" data-platform="Xbox"><span class="p-icon">🟩</span>Xbox</div>
-          <div class="platform-btn" data-platform="Nintendo"><span class="p-icon">🔴</span>Switch</div>
-          <div class="platform-btn" data-platform="Mobile"><span class="p-icon">📱</span>Mobile</div>
+          <div class="platform-btn" data-platform="PC"><span class="p-icon"><img class="platform-icon" src="assets/pc.png" alt=""></span>PC</div>
+          <div class="platform-btn" data-platform="PlayStation"><span class="p-icon"><img class="platform-icon" src="assets/playstation.png" alt=""></span>PS</div>
+          <div class="platform-btn" data-platform="Xbox"><span class="p-icon"><img class="platform-icon" src="assets/xbox.png" alt=""></span>Xbox</div>
+          <div class="platform-btn" data-platform="Nintendo"><span class="p-icon"><img class="platform-icon" src="assets/switch.png" alt=""></span>Switch</div>
+          <div class="platform-btn" data-platform="Mobile"><span class="p-icon"><img class="platform-icon" src="assets/mobile.png" alt=""></span>Mobile</div>
         </div>
       </div>
 
@@ -198,14 +198,14 @@
         <div class="social-section-title">LINKS DE PLATAFORMAS <span style="color:var(--text-muted);font-size:9px;">(opcional — username ou URL)</span></div>
         <div class="social-input-row">
           <div class="social-input-group">
-            <span class="s-icon">💬</span>
+            <span class="s-icon"></span>
             <div class="form-group" style="flex:1;margin-bottom:0;">
               <label for="e-discord">Discord</label>
               <input type="text" id="e-discord" placeholder="usuario#1234" />
             </div>
           </div>
           <div class="social-input-group">
-            <span class="s-icon">🎮</span>
+            <span class="s-icon"></span>
             <div class="form-group" style="flex:1;margin-bottom:0;">
               <label for="e-steam">Steam</label>
               <input type="text" id="e-steam" placeholder="URL ou username" />
@@ -219,28 +219,28 @@
             </div>
           </div>
           <div class="social-input-group">
-            <span class="s-icon">🟩</span>
+            <span class="s-icon"></span>
             <div class="form-group" style="flex:1;margin-bottom:0;">
               <label for="e-xbox">Xbox / Gamertag</label>
               <input type="text" id="e-xbox" placeholder="Gamertag" />
             </div>
           </div>
           <div class="social-input-group">
-            <span class="s-icon">🎮</span>
+            <span class="s-icon"></span>
             <div class="form-group" style="flex:1;margin-bottom:0;">
               <label for="e-psn">PlayStation Network</label>
               <input type="text" id="e-psn" placeholder="PSN ID" />
             </div>
           </div>
           <div class="social-input-group">
-            <span class="s-icon">🟣</span>
+            <span class="s-icon"></span>
             <div class="form-group" style="flex:1;margin-bottom:0;">
               <label for="e-twitch">Twitch</label>
               <input type="text" id="e-twitch" placeholder="twitch.tv/usuario" />
             </div>
           </div>
           <div class="social-input-group">
-            <span class="s-icon">🔴</span>
+            <span class="s-icon"></span>
             <div class="form-group" style="flex:1;margin-bottom:0;">
               <label for="e-youtube">YouTube</label>
               <input type="text" id="e-youtube" placeholder="Canal YouTube" />
@@ -250,7 +250,7 @@
       </div>
 
       <button class="btn btn-primary" id="btn-save" style="width:100%;padding:13px;margin-top:16px;">
-        <span id="save-text">💾 SALVAR ALTERAÇÕES</span>
+        <span id="save-text"> SALVAR ALTERAÇÕES</span>
         <div class="spinner" id="save-spinner" style="display:none"></div>
       </button>
       <div class="save-msg" id="save-msg"></div>
@@ -259,5 +259,6 @@
 
   <div id="toast-container"></div>
   <script type="module" src="profile.js"></script>
+<script type="module" src="branding.js"></script>
 </body>
 </html>

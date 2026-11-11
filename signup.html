@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Insert Coin — Criar Conta</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
+  <link rel="icon" href="assets/brand.png">
   <style>
     body {
       display: flex;
@@ -124,14 +124,14 @@
   </style>
   <link rel="stylesheet" href="social.css" />
 </head>
-<body>
+<body><header class="topbar"><a class="topbar-logo" href="home.html"><img class="brand-logo" src="assets/brand.png" alt="">InsertCoin</a></header>
   <div class="bg-grid"></div>
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
 
   <div class="auth-wrap">
     <div class="logo">
-      <div class="logo-name"><i class="coin-mark" aria-hidden="true"></i>InsertCoin</div>
+      <div class="logo-name"><img class="brand-logo" src="assets/brand.png" alt="">InsertCoin</div>
     </div>
 
     <div class="auth-card">
@@ -176,11 +176,11 @@
         <div class="form-group">
           <label>Plataforma Principal</label>
           <div class="platform-grid">
-            <div class="platform-btn" data-platform="PC"><span class="p-icon">🖥️</span>PC</div>
-            <div class="platform-btn" data-platform="PlayStation"><span class="p-icon">🎮</span>PS</div>
-            <div class="platform-btn" data-platform="Xbox"><span class="p-icon">🟩</span>Xbox</div>
-            <div class="platform-btn" data-platform="Nintendo"><span class="p-icon">🔴</span>Switch</div>
-            <div class="platform-btn" data-platform="Mobile"><span class="p-icon">📱</span>Mobile</div>
+            <div class="platform-btn" data-platform="PC"><span class="p-icon"><img class="platform-icon" src="assets/pc.png" alt=""></span>PC</div>
+            <div class="platform-btn" data-platform="PlayStation"><span class="p-icon"><img class="platform-icon" src="assets/playstation.png" alt=""></span>PS</div>
+            <div class="platform-btn" data-platform="Xbox"><span class="p-icon"><img class="platform-icon" src="assets/xbox.png" alt=""></span>Xbox</div>
+            <div class="platform-btn" data-platform="Nintendo"><span class="p-icon"><img class="platform-icon" src="assets/switch.png" alt=""></span>Switch</div>
+            <div class="platform-btn" data-platform="Mobile"><span class="p-icon"><img class="platform-icon" src="assets/mobile.png" alt=""></span>Mobile</div>
           </div>
           <input type="hidden" id="platform" />
         </div>
@@ -204,7 +204,7 @@
         <div class="btn-row">
           <button class="btn btn-ghost" id="back-2">◀ VOLTAR</button>
           <button class="btn btn-primary" id="btn-register">
-            <span id="reg-text">🎮 CRIAR CONTA</span>
+            <span id="reg-text"> CRIAR CONTA</span>
             <div class="spinner" id="reg-spinner" style="display:none"></div>
           </button>
         </div>
@@ -354,7 +354,7 @@
           mainPlatform: selectedPlatform,
           favoriteGames: games
         });
-        showToast("Conta criada! Bem-vindo à arena! 🎮");
+        showToast("Conta criada! Bem-vindo à arena! ");
         setTimeout(() => (window.location.href = "home.html"), 1000);
       } catch (e) {
         showErr("err-2", firebaseErrors[e.code] || "Erro ao criar conta. Tente novamente.");
@@ -364,5 +364,6 @@
       }
     });
   </script>
+<script type="module" src="branding.js"></script>
 </body>
 </html>

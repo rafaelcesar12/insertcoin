@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Insert Coin — Jogos</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
+  <link rel="icon" href="assets/brand.png">
   <style>
     body { background: var(--bg); }
     .bg-grid { position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,200,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,200,0.025) 1px,transparent 1px);background-size:50px 50px;pointer-events:none; }
@@ -35,7 +35,7 @@
 <body>
   <div class="bg-grid"></div>
   <header class="topbar">
-    <a class="topbar-logo" href="home.html" aria-label="InsertCoin — início"><i class="coin-mark" aria-hidden="true"></i>InsertCoin</a>
+    <a class="topbar-logo" href="home.html" aria-label="InsertCoin — início"><img class="brand-logo" src="assets/brand.png" alt="">InsertCoin</a>
     <div class="topbar-nav">
       <a class="btn btn-ghost" href="home.html" style="padding:6px 14px;font-size:10px;">← FEED</a>
     </div>
@@ -57,21 +57,21 @@
     <h2 class="arcade-title">Jogos do InsertCoin</h2>
     <div class="games-grid">
       <a class="game-card" href="numero.html">
-        <div class="emoji">🎲</div>
+        <div class="emoji"></div>
         <h2>QUAL É A NOTA?</h2>
         <p>Sorteie um número secreto e responda perguntas sem se entregar. A galera tenta adivinhar.</p>
         <span class="tag">Online · 3+ jogadores</span>
       </a>
 
       <a class="game-card soon" href="#">
-        <div class="emoji">🔍</div>
+        <div class="emoji"></div>
         <h2>FIND IT!</h2>
         <p>Estilo Dobble — ache o símbolo em comum antes de todo mundo.</p>
         <span class="tag">Em breve aqui dentro</span>
       </a>
 
       <a class="game-card soon" href="#">
-        <div class="emoji">🏈</div>
+        <div class="emoji"></div>
         <h2>ARENA DISC FOOTBALL</h2>
         <p>Futebol americano de mesa, multiplayer em tempo real.</p>
         <span class="tag">Em breve aqui dentro</span>
@@ -79,5 +79,6 @@
     </div>
   </div>
 <script type="module" src="catalog.js"></script>
+<script type="module" src="branding.js"></script>
 </body>
 </html>
