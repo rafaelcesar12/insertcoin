@@ -116,6 +116,11 @@ function buildSquadCard(squad) {
   });
 
   if (isMember) {
+    const voice = document.createElement("a");
+    voice.className = "btn btn-ghost";
+    voice.textContent = "Sala de voz";
+    voice.href = "voice.html?squad=" + encodeURIComponent(squad.id);
+    card.querySelector(".squad-actions").prepend(voice);
     const panel = document.createElement("section");
     panel.className = "steam-panel";
     let participants;
