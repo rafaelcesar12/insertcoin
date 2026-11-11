@@ -19,7 +19,7 @@ module.exports = async function voice(req, res) {
     if (user.banned?.booleanValue) return res.status(403).json({error:"Conta indisponível."});
     const {LIVEKIT_API_KEY:key,LIVEKIT_API_SECRET:secret,LIVEKIT_PUBLIC_URL:url} = process.env;
     if (!key || !secret || !url) return res.status(503).json({error:"A sala de voz aguarda a conexão do servidor de chamadas."});
-    const camera = await cameraEnabled();
+    const camera = await cameraEnabled().catch(()=>false);
     if (req.body.settingsOnly === true) return res.json({camera});
     const token = new AccessToken(key,secret,{identity:uid,name:user.nickname?.stringValue || "Jogador",ttl:"5m"});
     token.addGrant({roomJoin:true,room:"insertcoin-"+id,canSubscribe:true,canPublish:true,canPublishData:false,
