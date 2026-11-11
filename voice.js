@@ -12,6 +12,11 @@ const room = new Room();
 let busy = false;
 let allowed = false;
 const media = new Map();
+let watching=null;
+el("open-devices").onclick=()=>el("device-dialog").showModal();
+el("close-devices").onclick=()=>el("device-dialog").close();
+function isScreen(pub){return pub.source===Track.Source.ScreenShare || pub.source===Track.Source.ScreenShareAudio;}
+
 let cameraAllowed = false;
 const kinds = ["audioinput","audiooutput","videoinput"];
 const prefs = {};
@@ -87,14 +92,26 @@ function render() {
   el("listen").hidden = !connected || room.canPlaybackAudio;
   const people = connected ? [local,...room.remoteParticipants.values()] : [];
   el("people").replaceChildren();
+  if(watching!==local.identity && !room.remoteParticipants.get(watching)?.isScreenShareEnabled)watching=null;
+  if(watching===local.identity && !local.isScreenShareEnabled)watching=null;
+  el("broadcasts").replaceChildren();
   const active = new Set();
   for (const person of people) {
     const entry = document.createElement("li");
     entry.textContent = (person.name || "Jogador") + (person === local ? " (você)" : "") + (person.isMicrophoneEnabled ? "" : " · mudo");
     el("people").append(entry);
+    if(person.isScreenShareEnabled){
+      const button=document.createElement("button");
+      button.className="broadcast";
+      button.textContent=(person.name || "Jogador")+" · "+(watching===person.identity?"Parar de assistir":"Assistir");
+      button.setAttribute("aria-pressed",String(watching===person.identity));
+      button.onclick=()=>{watching=watching===person.identity?null:person.identity;render();};
+      el("broadcasts").append(button);
+    }
     for (const pub of person.trackPublications.values()) {
+      if(person!==local)pub.setSubscribed(!isScreen(pub) || watching===person.identity);
       const track = pub.track;
-      if (!track || (person === local && track.kind === Track.Kind.Audio)) continue;
+      if (!track || (isScreen(pub) && watching!==person.identity) || (person === local && track.kind === Track.Kind.Audio)) continue;
       active.add(track);
       if (media.has(track)) continue;
       const player = track.attach();
@@ -108,7 +125,7 @@ function render() {
         const caption = document.createElement("figcaption");
         caption.textContent = (pub.source === Track.Source.Camera ? "Webcam de " : "Tela de ") + (person.name || "jogador");
         container.append(player,caption);
-        el("streams").append(container);
+        el(pub.source===Track.Source.Camera ? "cameras" : "screen-stage").append(container);
       } else el("audio").append(player);
       media.set(track,{player,container});
     }
@@ -116,11 +133,12 @@ function render() {
   for (const [track,{player,container}] of media) {
     if (!active.has(track)) { track.detach(player); container.remove(); media.delete(track); }
   }
-  el("empty").hidden = !!el("streams").querySelector("video");
+  el("empty").hidden = !!el("screen-stage").querySelector("video");
+  el("streams").classList.toggle("watching",!!el("screen-stage").querySelector("video"));
 }
 
 for (const event of [RoomEvent.ParticipantConnected,RoomEvent.ParticipantDisconnected,RoomEvent.TrackSubscribed,
-  RoomEvent.TrackUnsubscribed,RoomEvent.TrackMuted,RoomEvent.TrackUnmuted,RoomEvent.LocalTrackPublished,
+  RoomEvent.TrackPublished,RoomEvent.TrackUnpublished,RoomEvent.TrackUnsubscribed,RoomEvent.TrackMuted,RoomEvent.TrackUnmuted,RoomEvent.LocalTrackPublished,
   RoomEvent.LocalTrackUnpublished,RoomEvent.AudioPlaybackStatusChanged]) room.on(event,render);
 room.on(RoomEvent.ParticipantPermissionsChanged,(_previous,participant)=>{
   if(participant!==room.localParticipant)return;
@@ -149,7 +167,7 @@ action("join",async()=>{
   const data = await response.json();
   if (!response.ok) throw new Error(data.error);
   cameraAllowed=data.camera===true;
-  await room.connect(data.url,data.token);
+  await room.connect(data.url,data.token,{autoSubscribe:false});
   if(el("audiooutput").value)await room.switchActiveDevice("audiooutput",el("audiooutput").value).catch(()=>{el("device-status").textContent="Usando a saída padrão do sistema.";});
   await room.startAudio();
   status("Conectado");
