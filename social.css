@@ -1,25 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap');
 :root {
   color-scheme: dark;
-  --bg: #18191a;
-  --bg-card: #242526;
-  --bg-card2: #303133;
-  --bg-input: #383a3d;
-  --text: #e8eaed;
-  --text-muted: #b0b4bb;
-  --border: #3b3d40;
-  --border-hot: #608cbd;
-  --neon-blue: #79b7ff;
-  --neon-green: #79b7ff;
-  --neon-purple: #a4bcee;
+  --bg: #080808;
+  --bg-card: #111111;
+  --bg-card2: #191919;
+  --bg-input: #202020;
+  --text: #fafafa;
+  --text-muted: #ababab;
+  --border: #303030;
+  --border-hot: #666;
+  --neon-blue: #ededed;
+  --neon-green: #ededed;
+  --neon-purple: #ccc;
   --neon-pink: #efa5b0;
   --glow-blue: none;
   --glow-green: none;
   --glow-purple: none;
-  --font-body: "Segoe UI", system-ui, sans-serif;
+  --font-body: "Geist", "Segoe UI", system-ui, sans-serif;
   --font-head: var(--font-body);
   --font-mono: var(--font-body);
   --radius: 8px;
-  --radius-lg: 12px;
+  --radius-lg: 8px;
 }
 
 body::before, .bg-grid, .orb, .pixel-corner { display: none; }
@@ -31,7 +32,7 @@ body::before, .bg-grid, .orb, .pixel-corner { display: none; }
 }
 .coin-mark {
   display: inline-grid; place-items: center; flex: none; width: 1.42em; height: 1.42em;
-  border-radius: 50%; background: #337eea; color: white;
+  border-radius: 50%; background: #eee; color: #111;
 }
 .coin-mark::before {
   content: ""; width: .59em; height: .73em; border: .12em solid currentColor;
@@ -40,8 +41,8 @@ body::before, .bg-grid, .orb, .pixel-corner { display: none; }
 .logo .logo-name { font-size: 38px; }
 .auth-card { background: var(--bg-card); border: 1px solid var(--border); box-shadow: 0 6px 24px #0003; }
 .btn, .nav-item, .feed-tab, .post-action-btn, .widget-title { letter-spacing: normal; text-transform: none; }
-.btn-primary, .btn-primary:hover { background: #216acf; color: white; box-shadow: none; }
-.btn-primary:hover { background: #2d75d8; }
+.btn-primary, .btn-primary:hover { background: #ededed; color: #111; box-shadow: none; }
+.btn-primary:hover { background: #ccc; }
 .btn-ghost, .upload-btn { color: var(--text); background: var(--bg-input); border-color: transparent; }
 .btn-ghost:hover, .upload-btn:hover { background: #484b50; color: white; }
 a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
@@ -50,7 +51,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .sidebar-left, .sidebar-right { border: 0; }
 .nav-item { font-size: 15px; font-weight: 600; color: var(--text); }
 .nav-item:hover, .post-action-btn:hover { background: var(--bg-card2); border-color: transparent; }
-.nav-item.active { background: #23364c; color: #92c6ff; border-color: transparent; }
+.nav-item.active { background: #222; color: #fff; border-color: transparent; }
 .widget-title { font-size: 16px; font-weight: 650; }
 .widget-title::after { display: none; }
 .online-dot { background: #53bc78; box-shadow: none; }
@@ -59,7 +60,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .main { min-width: 0; }
 .feed-tabs { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 0 12px; }
 .feed-tab { flex: 1; background: transparent; border: 0; border-bottom: 3px solid transparent; font-size: 15px; font-weight: 600; padding: 12px; }
-.feed-tab.active { color: var(--neon-blue); border-color: #4897ff; }
+.feed-tab.active { color: var(--neon-blue); border-color: #eee; }
 .composer { margin-bottom: 16px; }
 .composer textarea { min-width: 0; min-height: 50px; border-radius: 18px; padding: 13px 16px; font-size: 15px; }
 .composer-bottom { margin-top: 14px; padding: 12px 0 0; border-top: 1px solid var(--border); }
@@ -68,8 +69,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .post-content { font-size: 16px; line-height: 1.5; }
 .post-action-btn { font-size: 14px; }
 .post-action-btn.liked { color: var(--neon-blue); }
-.avatar { background: #345679; color: #e1efff; border-color: #4d6985; box-shadow: none; }
-.profile-banner { background: linear-gradient(120deg,#263850,#375777 52%,#344254); }
+.avatar { background: #242424; color: #eee; border-color: #444; box-shadow: none; }
+.profile-banner { background: repeating-linear-gradient(135deg,#151515 0 1px,#0c0c0c 1px 14px); }
 .profile-banner::before { background: none; }
 #steam-library { scroll-margin-top: 70px; }
 @media (min-width: 1101px) {
@@ -82,3 +83,26 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   .main { padding-inline: 8px; }
   .mob-nav-item { font-size: 10px; }
 }
+
+.page-wrap h1 { font-size: clamp(26px,4vw,40px); letter-spacing: -.05em; line-height: 1.15; font-weight: 600; margin: 12px 0 24px; }
+.topbar-logo { font-size: 21px; }
+.feed-tabs { border-radius: 0; border-width: 0 0 1px; background: transparent; }
+.composer textarea { border-radius: 6px; }
+.catalog-search, .catalog-tabs { display: flex; gap: 8px; margin-bottom: 18px; }
+.catalog-search input { flex: 1; min-width: 0; }
+.catalog-tabs { border-bottom: 1px solid var(--border); gap: 20px; }
+.catalog-tabs button { border: 0; border-bottom: 2px solid transparent; padding: 10px 0; color: var(--text-muted); font: inherit; background: transparent; cursor: pointer; }
+.catalog-tabs button[aria-pressed=true] { color: var(--text); border-color: currentColor; }
+#catalog-status { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+.catalog-row { width: 100%; display: flex; align-items: center; text-align: start; gap: 14px; color: var(--text); background: var(--bg-card); border: 0; border-bottom: 1px solid var(--border); padding: 10px 12px; font: inherit; cursor: pointer; }
+.catalog-row:hover { background: var(--bg-card2); }
+.catalog-row small, .catalog-row span { font-variant-numeric: tabular-nums; color: var(--text-muted); }
+.catalog-row img { width: clamp(52px,10vw,100px); aspect-ratio: 231/87; object-fit: cover; border-radius: 3px; }
+.catalog-row strong { flex: 1; min-width: 0; overflow-wrap: anywhere; font-size: 14px; }
+.catalog-row span { text-align: right; font-size: 13px; }
+.arcade-title { margin: 44px 0 16px; font-size: 22px; letter-spacing: -.04em; }
+#game-detail { margin: auto; padding: 18px; background: var(--bg-card); color: var(--text); border: 1px solid var(--border); border-radius: 10px; width: min(480px,92vw); }
+#game-detail::backdrop { background: #000b; }
+#close-detail { display: block; margin: 0 0 12px auto; }
+#detail-body img { width: 100%; border-radius: 4px; margin-bottom: 12px; }
+#detail-body p { color: var(--text-muted); margin: 8px 0 18px; }
