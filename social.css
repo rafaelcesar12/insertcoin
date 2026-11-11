@@ -117,3 +117,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 #people li.speaking{background:#173423;color:#a4efbd;border-radius:6px;padding-inline:8px}
 #people li.speaking::after{content:" · falando";font-size:11px}
 #cameras figure.speaking{outline:2px solid #53bc78;outline-offset:-2px}
+
+.catalog-tabs{flex-wrap:wrap;gap:4px 18px}
+.steam-source{font-size:12px;color:var(--text-muted);margin:18px 0}
+#catalog-list{min-height:140px}

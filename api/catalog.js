@@ -3,7 +3,7 @@ const web = "https://api.steampowered.com/";
 
 async function read(url) {
   const result = await fetch(url, { signal: AbortSignal.timeout(8000) });
-  if (!result.ok) throw new Error("Steam indisponÃ­vel");
+  if (!result.ok) throw new Error("Steam indisponível");
   return result.json();
 }
 
@@ -15,7 +15,30 @@ module.exports = async function catalog(req, res) {
     if (view === "search" && typeof q === "string" && q.trim().length >= 2 && q.length <= 80) {
       const result = await read(store + "storesearch/?" + new URLSearchParams({ term: q.trim(), cc: "br", l: "brazilian" }));
       items = result.items.filter(item => item.type === "app").map(item => ({ id: item.id, name: item.name, image: item.tiny_image }));
-    } else if (view === "charts") {
+    } else if (["sellers","wishlist","calendar","ratings"].includes(view)) {
+      const filters={sellers:"globaltopsellers",wishlist:"popularwishlist",calendar:"popularcomingsoon"};
+      const params=new URLSearchParams({start:"0",count:"50",cc:"br",l:"brazilian",json:"1",infinite:"1"});
+      if(view==="ratings"){params.set("sort_by","Reviews_DESC");params.set("l","english");}
+      else params.set("filter",filters[view]);
+      if(view==="calendar")params.set("sort_by","Released_ASC");
+      const result=await read("https://store.steampowered.com/search/results/?"+params);
+      if(typeof result.results_html!=="string")throw Error("Formato indisponível");
+      const $=require("cheerio").load(result.results_html);
+      items=[];
+      $("a.search_result_row").each((_,node)=>{
+        const row=$(node),id=row.attr("data-ds-appid");
+        if(!/^[1-9]\d*$/.test(id))return;
+        const summary=row.find(".search_review_summary").attr("data-tooltip-html") || "";
+        const rating=summary.match(/([\d.]+)% of the ([\d,]+) user reviews/);
+        const reviews=rating ? Number(rating[2].replaceAll(",","")) : null;
+        const positive=rating ? Number(rating[1]) : null;
+        items.push({reviews,positive,id:Number(id),name:row.find(".title").text().trim(),image:row.find("img").attr("src"),release:row.find(".search_released").text().trim()});
+      });
+      if(view==="ratings"){
+        items=items.filter(game=>game.reviews>=500 && game.positive!==null);
+        items.sort((a,b)=>b.positive-a.positive || b.reviews-a.reviews);
+      }
+    } else if (view === "charts" || view === "daily") {
       const chart = await read(web + "ISteamChartsService/GetMostPlayedGames/v1/");
       const ranks = chart.response.ranks.slice(0, 20);
       const query = { ids: ranks.map(row => ({ appid: row.appid })), context: { country_code: "BR", language: "brazilian" }, data_request: { include_assets: true } };
@@ -39,12 +62,12 @@ module.exports = async function catalog(req, res) {
         read(web + "ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=" + id).catch(() => null)
       ]);
       const game = details[id]?.data;
-      if (!game) return res.status(404).json({ error: "Jogo indisponÃ­vel na loja brasileira." });
+      if (!game) return res.status(404).json({ error: "Jogo indisponível na loja brasileira." });
       items = [{ id: game.steam_appid, name: game.name, image: game.header_image, modes: (game.categories || []).filter(c => [1,9,24,36,37,38,39,47,48,49].includes(c.id)).map(c => c.description),
         online: online?.response?.result === 1 ? online.response.player_count : null, release: game.release_date?.date,
         priceLabel: game.is_free ? "Gratuito" : game.price_overview?.final_formatted }];
-    } else return res.status(400).json({ error: "Consulta invÃ¡lida." });
+    } else return res.status(400).json({ error: "Consulta inválida." });
     res.setHeader("Cache-Control", "public, max-age=60, s-maxage=300, stale-while-revalidate=600");
     return res.json({ items });
-  } catch { return res.status(502).json({ error: "A Steam estÃ¡ indisponÃ­vel. Tente novamente." }); }
+  } catch { return res.status(502).json({ error: "A Steam está indisponível. Tente novamente." }); }
 };

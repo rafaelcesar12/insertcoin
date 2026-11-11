@@ -49,9 +49,26 @@ async function load(view, q = "") {
   list.replaceChildren();
   status.textContent = "Consultando a Steam…";
   try {
+    if(view==="status"){
+      const response=await fetch("/api/steam-status");
+      if(!response.ok)throw Error();
+      const data=await response.json();
+      if(request!==latest)return;
+      status.textContent="Verificação de acesso pelo servidor do InsertCoin · "+new Date(data.checkedAt).toLocaleString("pt-BR")+" · Não representa todos os servidores Steam.";
+      for(const service of data.items){
+        const row=element("div","");row.className="catalog-row";
+        row.append(element("strong",service.name),element("span",service.state));list.append(row);
+      }
+      return;
+    }
     const games = await query({ view, q });
     if (request !== latest) return;
-    status.textContent = games.length ? ({ charts: "Ranking global · Pico de jogadores simultâneos", deals: "Ofertas em destaque · Preços em reais", search: "Resultados para “" + q + "”" })[view] : "Nenhum jogo encontrado.";
+    status.textContent = games.length ? ({ charts: "Ranking Steam · Pico de jogadores simultâneos",
+      calendar:"Próximos lançamentos · Seleção da loja Steam ordenada por lançamento",
+      ratings:"Percentual positivo · Mínimo de 500 avaliações · Amostra de 50 resultados da busca Steam por avaliações",
+      sellers:"Mais vendidos globalmente · Classificação por receita da Steam",
+      wishlist:"Jogos mais desejados · Classificação pública da Steam",
+      daily:"Mais jogados por atividade diária · Ordem fornecida pela Steam · Sem contagem de usuários únicos", deals: "Ofertas em destaque · Preços em reais", search: "Resultados para “" + q + "”" })[view] : "Nenhum jogo encontrado.";
     for (const game of games) {
       const row = element("button", "");
       row.className = "catalog-row";
@@ -60,6 +77,8 @@ async function load(view, q = "") {
       row.append(element("strong", game.name));
       if (view === "charts") row.append(element("span", number.format(game.peak)));
       if (view === "deals") row.append(element("span", "−" + game.discount + "% · " + money.format(game.price)));
+      if(view==="calendar")row.append(element("span",game.release || "Data a confirmar"));
+      if(view==="ratings")row.append(element("span",game.positive+"% · "+number.format(game.reviews)+" avaliações"));
       row.onclick = () => showGame(game.id);
       list.append(row);
     }
