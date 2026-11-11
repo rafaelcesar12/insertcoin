@@ -14,3 +14,10 @@
 #streams video{width:100%;max-height:65vh;background:#000}
 .voice-stage [hidden]{display:none}
 @media(max-width:700px){.voice-layout{grid-template-columns:1fr}.voice-layout aside{border-bottom:1px solid var(--border)}.voice-header,.voice-layout aside,.voice-stage header,.voice-stage footer{padding:12px 16px}}
+.device-panel{padding:10px 24px;border-block:1px solid var(--border);background:var(--bg-card)}
+.device-panel summary{cursor:pointer;font-weight:600}
+.device-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:12px;margin:12px 0}
+.device-grid select{width:100%;display:block;margin-top:4px}
+.device-panel input[type=checkbox]{width:auto}
+.device-panel .btn{margin:8px}
+#device-status{color:var(--text-muted);font-size:13px}

@@ -62,6 +62,9 @@
     .access-denied .icon { font-size:60px; }
     .access-denied h2 { font-family:var(--font-head);color:#ff3355;font-size:20px; }
     .access-denied p { color:var(--text-muted); }
+  #platform-tools{margin-bottom:22px}#platform-tools h3{margin:16px 0 6px}#platform-controls{border:0;margin-top:12px}
+    #platform-controls form{display:flex;flex-wrap:wrap;gap:8px}#platform-controls form input,#platform-controls select{width:auto;max-width:100%}
+    #platform-controls input[type=checkbox]{width:auto}#manage-squads{list-style:none}#manage-squads li{padding:6px 0}
   </style>
   <link rel="stylesheet" href="social.css" />
 </head>
@@ -94,6 +97,32 @@
       <div class="stat-card"><div class="stat-num" id="stat-admins">—</div><div class="stat-lbl">ADMINS</div></div>
     </div>
 
+    <section id="platform-tools" class="card" hidden>
+      <h2>Configurações da plataforma</h2>
+      <p id="platform-status" role="status"></p>
+      <fieldset id="platform-controls">
+        <label><input id="enable-camera" type="checkbox"> Permitir webcam nas salas de voz</label>
+        <h3>Criar usuário</h3>
+        <form id="create-account">
+          <input name="nickname" aria-label="Nickname" placeholder="Nickname" required maxlength="32">
+          <input name="email" aria-label="E-mail" placeholder="E-mail" type="email" required>
+          <input name="password" aria-label="Senha inicial" placeholder="Senha inicial" type="password" autocomplete="new-password" required minlength="6">
+          <button class="btn btn-primary">Criar conta</button>
+        </form>
+        <h3>Gerenciar usuário</h3>
+        <form id="manage-account">
+          <select name="id" aria-label="Usuário" required></select>
+          <input name="xp" aria-label="Novo total de XP" placeholder="Total de XP" type="number" min="0" max="100000000">
+          <button class="btn btn-ghost" value="xp">Definir XP</button>
+          <input name="role" aria-label="Nome do cargo" placeholder="Nome do cargo" maxlength="32">
+          <button class="btn btn-ghost" value="role">Salvar cargo</button>
+          <button class="btn btn-danger" value="delete">Excluir usuário</button>
+        </form>
+        <h3>Squads</h3>
+        <form id="create-squad"><input name="name" aria-label="Nome do squad" placeholder="Nome do squad" required maxlength="60"><button class="btn btn-primary">Criar squad</button></form>
+        <ul id="manage-squads"></ul>
+      </fieldset>
+    </section>
     <!-- Search -->
     <div class="admin-search">
       <input type="text" id="admin-search" placeholder="Filtrar por nickname ou e-mail..." />
@@ -125,6 +154,7 @@
     import { requireAuth, logoutUser } from "./auth.js";
     import { getUserProfile, getAllUsers, banUser, unbanUser, setAdmin, giveXP, setUserRole } from "./firestore.js";
 
+    import {configurePanel} from "./admin-tools.js";
     let currentUser = null;
     let allUsers    = [];
 
@@ -136,11 +166,16 @@
       document.getElementById("access-denied").style.display = "flex";
     } else {
       document.getElementById("admin-panel").style.display = "block";
-      loadUsers();
+      await loadUsers();
+      await configurePanel(user,loadUsers);
     }
 
     async function loadUsers() {
-      allUsers = await getAllUsers(200).catch(() => []);
+      allUsers = await getAllUsers().catch(() => []);
+      const select=document.querySelector("#manage-account select");
+      const selected=select.value;
+      select.replaceChildren(new Option("Selecionar usuário",""),...allUsers.map(u=>new Option(u.nickname+" · "+u.email,u.uid)));
+      select.value=selected;
       updateStats();
       renderTable(allUsers);
     }
@@ -174,14 +209,14 @@
           <div class="user-email">${escHtml(u.email || "—")}</div>
         </td>
         <td><span class="platform-badge" style="font-size:10px;">${escHtml(u.mainPlatform || "—")}</span></td>
-        <td style="font-family:var(--font-mono);font-size:11px;color:var(--neon-purple);">${u.xp || 0} XP · Nv${u.level || 1}</td>
+        <td style="font-family:var(--font-mono);font-size:11px;color:var(--neon-purple);">${Number(u.xp) || 0} XP · Nv${Number(u.level) || 1}</td>
         <td>
           ${u.banned
             ? `<span class="role-badge role-banned">BANIDO</span>`
             : `<span style="color:var(--neon-green);font-size:11px;font-family:var(--font-mono);">ATIVO</span>`}
         </td>
         <td>
-          <span class="role-badge ${u.isAdmin ? "role-admin" : "role-user"}">${u.isAdmin ? "ADMIN" : u.role || "USER"}</span>
+          <span class="role-badge ${u.isAdmin ? "role-admin" : "role-user"}">${u.isAdmin ? "ADMIN" : escHtml(u.role || "USER")}</span>
         </td>
         <td>
           ${isMe ? `<span style="color:var(--text-muted);font-size:11px;">— você mesmo —</span>` : `

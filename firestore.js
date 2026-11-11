@@ -261,8 +261,8 @@ export async function deleteSquad(squadId, ownerUid) {
 
 // ── ADMIN ─────────────────────────────────────
 
-export async function getAllUsers(limitCount = 100) {
-  const q = query(collection(db, "users"), orderBy("createdAt", "desc"), limit(limitCount));
+export async function getAllUsers(limitCount) {
+  const q = query(collection(db, "users"), orderBy("createdAt", "desc"), ...(limitCount ? [limit(limitCount)] : []));
   const snap = await getDocs(q);
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
