@@ -37,17 +37,17 @@ module.exports=async function admin(req,res){
       return res.json({ok:true});
     }
     if(action==="create" && typeof nickname==="string" && nickname.trim() && nickname.length<=32 && typeof password==="string" && password.length>=6){
-      const {auth,db}=adminServices();
+      const {auth,db}=await adminServices();
       const record=await auth.createUser({email,password,displayName:nickname.trim()});
       try {await db.collection("users").doc(record.uid).create({uid:record.uid,email:record.email,nickname:nickname.trim(),favoriteGames:[],mainPlatform:"",bio:"",xp:10,level:1,isAdmin:false,isOnline:false,badges:[],friends:[],friendRequests:[],createdAt:new Date()});}
       catch(e){await auth.deleteUser(record.uid);throw e;}
       return res.json({ok:true});
     }
     if(action==="delete" && typeof id==="string" && id!==owner && /^[\w-]{1,128}$/.test(id)){
-      const {auth,db}=adminServices();
+      const {auth,db}=await adminServices();
       const squads=db.collection("squads");
       if(!(await squads.where("ownerUid","==",id).limit(1).get()).empty)throw Error("Exclua ou transfira os squads deste usuário primeiro.");
-      const {FieldValue}=require("firebase-admin/firestore");
+      const {FieldValue}=await import("firebase-admin/firestore");
       const users=db.collection("users");
       const profile=await users.doc(id).get();
       for(const field of ["friends","friendRequests"]){
