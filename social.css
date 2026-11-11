@@ -121,3 +121,12 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .catalog-tabs{flex-wrap:wrap;gap:4px 18px}
 .steam-source{font-size:12px;color:var(--text-muted);margin:18px 0}
 #catalog-list{min-height:140px}
+
+.steam-status-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.status-panel{border:1px solid var(--border);border-radius:10px;background:var(--bg-card);overflow:hidden;margin-bottom:20px}
+.status-panel h2{font-size:16px;padding:14px 16px;border-bottom:1px solid var(--border);font-weight:600}
+.status-row{display:flex;align-items:center;gap:12px;padding:11px 16px;font-size:14px;border-bottom:1px solid #ffffff06}
+.status-row>span:first-child{flex:1;min-width:0}
+.service-state{text-align:right;font-size:13px;min-width:70px}
+.service-state.healthy{color:#66d498}.service-state.warning{color:#e9c56c}.service-state.unhealthy{color:#ff8c8c}
+@media(max-width:760px){.steam-status-grid{grid-template-columns:1fr}}

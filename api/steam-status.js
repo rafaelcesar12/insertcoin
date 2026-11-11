@@ -12,8 +12,8 @@ module.exports=async(req,res)=>{
       const r=await fetch(url,{signal:AbortSignal.timeout(6000)});
       if(r.ok){
         const data=(await r.json()).result;
-        for(const [name,state] of Object.entries(data?.services||{}))items.push({name:"Counter-Strike · "+name,state:String(state)});
-        for(const [name,region] of Object.entries(data?.datacenters||{}))items.push({name:"Counter-Strike · "+name,state:typeof region==="object"?Object.entries(region).map(([k,v])=>k+" "+v).join(" · "):String(region)});
+        for(const [name,state] of Object.entries(data?.services||{}))items.push({name:"Counter-Strike · "+name,state:String(state),group:"game"});
+        for(const [name,region] of Object.entries(data?.datacenters||{}))items.push({name,group:"region",capacity:region.capacity,load:region.load,state:typeof region==="object"?Object.entries(region).map(([k,v])=>k+" "+v).join(" · "):String(region)});
       }
     }catch{}
   }

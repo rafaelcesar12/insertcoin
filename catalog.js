@@ -6,6 +6,34 @@ const number = new Intl.NumberFormat("pt-BR");
 const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 let latest = 0;
 let selected = 0;
+let activeView="charts";
+let refreshAt=0;
+function statusValue(text) {
+  const label=({normal:"Normal",idle:"Ocioso",low:"Baixa",medium:"Média",high:"Alta",offline:"Indisponível",full:"Completa",critical:"Crítica"})[text] || text || "Sem dados";
+  const value=element("span",label);
+  value.className="service-state "+(/normal|idle|low|Resposta normal/.test(text)?"healthy":/offline|Falha|Sem resposta|critical/.test(text)?"unhealthy":"warning");
+  return value;
+}
+function statusPanel(title,items,regions=false){
+  const panel=element("section","");panel.className="status-panel";
+  panel.append(element("h2",title));
+  if(!items.length)panel.append(element("p","Dados indisponíveis nesta consulta."));
+  for(const item of items){
+    const row=element("div","");row.className="status-row";
+    row.append(element("span",item.name.replace("Counter-Strike · ","")));
+    if(regions){row.append(statusValue(item.load),statusValue(item.capacity));}
+    else row.append(statusValue(item.state));
+    panel.append(row);
+  }
+  return panel;
+}
+setInterval(()=>{
+  if(activeView!=="status" || !refreshAt)return;
+  const seconds=Math.max(0,Math.ceil((refreshAt-Date.now())/1000));
+  const counter=document.getElementById("status-countdown");
+  if(counter)counter.textContent="Atualiza em "+seconds+" s";
+  if(seconds===0 && !document.hidden){refreshAt=0;load("status");}
+},1000);
 
 function element(tag, text) {
   const node = document.createElement(tag);
@@ -44,8 +72,11 @@ async function showGame(id) {
   } catch { if (request === selected) detail.textContent = "Não foi possível carregar os detalhes. Feche e tente novamente."; }
 }
 async function load(view, q = "") {
+  activeView=view;
+  refreshAt=0;
   const request = ++latest;
   document.querySelectorAll("[data-view]").forEach(btn => btn.setAttribute("aria-pressed", btn.dataset.view === view));
+  list.className="";
   list.replaceChildren();
   status.textContent = "Consultando a Steam…";
   try {
@@ -54,11 +85,15 @@ async function load(view, q = "") {
       if(!response.ok)throw Error();
       const data=await response.json();
       if(request!==latest)return;
-      status.textContent="Verificação de acesso pelo servidor do InsertCoin · "+new Date(data.checkedAt).toLocaleString("pt-BR")+" · Não representa todos os servidores Steam.";
-      for(const service of data.items){
-        const row=element("div","");row.className="catalog-row";
-        row.append(element("strong",service.name),element("span",service.state));list.append(row);
-      }
+      status.textContent="Última consulta · "+new Date(data.checkedAt).toLocaleString("pt-BR")+" · ";
+      const counter=element("span","");counter.id="status-countdown";status.append(counter);
+      list.className="steam-status-grid";
+      const left=element("div","");
+      left.append(statusPanel("Serviços Steam",data.items.filter(item=>!item.group)),
+        statusPanel("Serviços de Counter-Strike",data.items.filter(item=>item.group==="game")));
+      const regions=statusPanel("Regiões de Counter-Strike · Carga / Capacidade",data.items.filter(item=>item.group==="region"),true);
+      list.append(left,regions);
+      refreshAt=Date.now()+60000;
       return;
     }
     const games = await query({ view, q });
