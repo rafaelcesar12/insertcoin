@@ -130,3 +130,17 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .service-state{text-align:right;font-size:13px;min-width:70px}
 .service-state.healthy{color:#66d498}.service-state.warning{color:#e9c56c}.service-state.unhealthy{color:#ff8c8c}
 @media(max-width:760px){.steam-status-grid{grid-template-columns:1fr}}
+
+body.auth-page{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;min-height:100dvh;padding:0;background:var(--bg)}
+.auth-page>.topbar{width:100%;height:64px;min-height:64px;padding:0 28px;display:flex;align-items:center;justify-content:flex-start;border-bottom:1px solid var(--border);background:var(--bg);position:relative}
+.auth-page .auth-wrap{width:min(100% - 40px,400px);margin:auto;flex-shrink:0;padding:40px 0}
+.auth-page .logo{margin-bottom:28px;text-align:center}
+.auth-page .logo .logo-name{font-size:28px;gap:10px;letter-spacing:-.05em}
+.auth-page .logo-name .brand-logo{width:76px;height:76px}
+.auth-page .auth-card{padding:28px;border-radius:10px}
+.auth-page .auth-card h2{font-size:18px;font-weight:600;letter-spacing:normal;text-transform:none;margin-bottom:24px}
+.auth-page input{font-size:15px}
+.auth-page .btn-primary{font-size:14px;letter-spacing:normal}
+.auth-page #reset-status{width:min(100% - 40px,400px);font-size:13px;color:var(--text-muted)}
+.auth-page #reset-status:empty{display:none}
+@media(max-width:480px){.auth-page>.topbar{padding:0 20px}.auth-page .auth-card{padding:24px}.auth-page .auth-wrap{padding:28px 0}}
