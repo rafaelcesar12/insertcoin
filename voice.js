@@ -14,9 +14,19 @@ let allowed = false;
 const media = new Map();
 let watching=null;
 let streamMuted=false;
+let streamVolume=1;
+function applyStreamVolume(){
+  for(const [track,{screenAudio}] of media)if(screenAudio)track.setVolume(streamMuted?0:streamVolume);
+}
 el("mute-stream").onclick=()=>{
   streamMuted=!streamMuted;
-  for(const {player,screenAudio} of media.values())if(screenAudio)player.muted=streamMuted;
+  applyStreamVolume();
+  render();
+};
+el("stream-volume").oninput=()=>{
+  streamVolume=Number(el("stream-volume").value)/100;
+  streamMuted=streamVolume===0;
+  applyStreamVolume();
   render();
 };
 el("open-devices").onclick=()=>el("device-dialog").showModal();
@@ -84,7 +94,10 @@ async function settings() {
 
 
 function render() {
-  el("mute-stream").hidden=!watching;
+  const remoteScreen=!!watching && watching!==room.localParticipant.identity;
+  el("mute-stream").hidden=!remoteScreen;
+  el("stream-volume-control").hidden=!remoteScreen;
+  el("stream-volume-value").textContent=(streamMuted?0:Math.round(streamVolume*100))+"%";
   el("mute-stream").textContent=streamMuted?"Ouvir transmissão":"Silenciar transmissão";
   el("mute-stream").setAttribute("aria-pressed",String(streamMuted));
   const connected = room.state === "connected";
@@ -130,7 +143,7 @@ function render() {
       const player = track.attach();
       player.autoplay = true;
       const screenAudio=pub.source===Track.Source.ScreenShareAudio;
-      if(screenAudio)player.muted=streamMuted;
+      if(screenAudio)track.setVolume(streamMuted?0:streamVolume);
       let container = player;
       if (track.kind === Track.Kind.Video) {
         player.playsInline = true;

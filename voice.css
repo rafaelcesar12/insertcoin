@@ -42,3 +42,8 @@
 .device-panel::backdrop{background:#000b}.device-grid{grid-template-columns:1fr}
 .voice-stage footer{padding:12px;flex-shrink:0}
 @media(max-width:700px){.voice-layout{height:auto;grid-template-columns:1fr}.voice-layout aside{max-height:200px}.voice-stage{min-height:65vh}#screen-stage video{max-height:50vh}}
+
+#stream-volume-control{display:flex;align-items:center;gap:8px;margin:0;font:inherit;font-size:12px;text-transform:none;letter-spacing:normal}
+#stream-volume-control[hidden]{display:none}
+#stream-volume{width:100px;padding:0;accent-color:#eee}
+#stream-volume-value{min-width:34px;font-variant-numeric:tabular-nums}
