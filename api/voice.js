@@ -13,7 +13,14 @@ module.exports = async function voice(req, res) {
     const read = path => fetch(base + path, {headers:{Authorization:bearer},signal:AbortSignal.timeout(8000)});
     const [squad, profile] = await Promise.all([read("squads/" + id),read("users/" + encodeURIComponent(uid))]);
     if (!squad.ok || !profile.ok) return res.status(403).json({error:"Sala indisponível para esta conta."});
-    const members = (await squad.json()).fields?.members?.arrayValue?.values || [];
+    const squadFields=(await squad.json()).fields;
+    const members = squadFields?.members?.arrayValue?.values || [];
+    if(id.startsWith("p_")){
+      const {adminServices}=require("../lib/firebase-admin");
+      const {admitted}=require("./squad");
+      const privateSquad=(await (await adminServices()).db.collection("squads").doc(id).get()).data();
+      if(!privateSquad || !admitted(privateSquad,id,uid))return res.status(403).json({error:"Entre no squad usando o código."});
+    }
     if (!members.some(value => value.stringValue === uid)) return res.status(403).json({error:"Entre no squad para participar."});
     const user = (await profile.json()).fields;
     if (user.banned?.booleanValue) return res.status(403).json({error:"Conta indisponível."});

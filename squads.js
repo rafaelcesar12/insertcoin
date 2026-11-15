@@ -5,6 +5,7 @@
 import { requireAuth, logoutUser } from "./auth.js";
 import { getUserProfile, createSquad, getOpenSquads, joinSquad, leaveSquad, deleteSquad } from "./firestore.js";
 
+import {enterSquad,squadRequest} from "./squad-client.js";
 import { comparison } from "./steam.js";
 import { getSquadMembers, chooseSquadGame } from "./firestore.js";
 
@@ -76,7 +77,7 @@ function buildSquadCard(squad) {
       <span class="squad-status ${squad.status}">${squad.status.toUpperCase()}</span>
     </div>
     ${squad.description ? `<div class="squad-desc">${escHtml(squad.description)}</div>` : ""}
-    <div class="squad-tags">
+    <div class="squad-tags"><span class="game-tag">${squad.isPrivate ? "Privado" : "Público"}</span>
       <span class="game-tag">${escHtml(squad.game)}</span>
       <span class="platform-badge">${escHtml(squad.platform)}</span>
       <span class="game-tag">${squad.members?.length || 1}/${squad.maxPlayers} jogadores</span>
@@ -94,7 +95,7 @@ function buildSquadCard(squad) {
     const id   = e.currentTarget.dataset.id;
     const name = e.currentTarget.dataset.name;
     try {
-      await joinSquad(id, currentUser.uid, userProfile?.nickname || "?");
+      await enterSquad(id);
       showToast(`Você entrou no squad ${name}! +5 XP `);
       await loadSquads();
     } catch (err) { showToast(err.message, "error"); }
@@ -118,13 +119,13 @@ function buildSquadCard(squad) {
   if (isMember) {
     const voice = document.createElement("a");
     voice.className = "btn btn-ghost";
-    voice.textContent = "Sala de voz";
-    voice.href = "voice.html?squad=" + encodeURIComponent(squad.id);
+    voice.textContent = "Abrir squad";
+    voice.href = "squad.html?id=" + encodeURIComponent(squad.id);
     card.querySelector(".squad-actions").prepend(voice);
     const panel = document.createElement("section");
     panel.className = "steam-panel";
     let participants;
-    comparison(panel, "Jogos que todos têm", async () => {
+    comparison(panel, "Jogos em comum", async () => {
       participants = await getSquadMembers(squad.id, currentUser.uid);
       return participants;
     }, isOwner ? async game => {
@@ -155,7 +156,8 @@ document.getElementById("btn-create-squad").addEventListener("click", async () =
   btn.disabled = true; btnText.style.display = "none"; spinner.style.display = "block";
 
   try {
-    await createSquad(currentUser.uid, userProfile?.nickname || "?", { name, game: game || "A decidir", platform, maxPlayers: maxP, description: desc });
+    const created=await squadRequest("create",{data:{name,game:game||"A decidir",platform,maxPlayers:Number(maxP),description:desc,isPrivate:document.getElementById("sq-private").checked}});
+    location.href="squad.html?id="+encodeURIComponent(created.id);
     showToast(`Squad "${name}" criado! +10 XP `);
     document.getElementById("sq-name").value = "";
     document.getElementById("sq-game").value = "";

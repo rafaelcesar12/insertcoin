@@ -144,3 +144,16 @@ body.auth-page{display:flex;flex-direction:column;align-items:stretch;justify-co
 .auth-page #reset-status{width:min(100% - 40px,400px);font-size:13px;color:var(--text-muted)}
 .auth-page #reset-status:empty{display:none}
 @media(max-width:480px){.auth-page>.topbar{padding:0 20px}.auth-page .auth-card{padding:24px}.auth-page .auth-wrap{padding:28px 0}}
+
+#site-navigation{position:fixed;top:76px;left:16px;width:185px;display:flex;flex-direction:column;gap:4px;z-index:30}
+#site-navigation a{padding:11px 14px;color:var(--text);border-radius:7px;font-weight:600;font-size:14px}
+#site-navigation a:hover,#site-navigation a[aria-current]{background:#242424}
+body.with-navigation{padding-left:210px}
+.squad-room{max-width:1000px;margin:auto;padding:28px 24px}
+.squad-room h1{margin-bottom:12px}#room-actions,#common-games{margin:18px 0}
+#squad-chat{border:1px solid var(--border);border-radius:10px;padding:20px;background:var(--bg-card)}
+#messages{max-height:400px;min-height:120px;overflow:auto;margin:16px 0}
+#messages article{padding:10px;border-bottom:1px solid var(--border)}#messages p{white-space:pre-wrap;overflow-wrap:anywhere}
+#messages time{font-size:12px;color:var(--text-muted)}
+#send-message{display:flex;gap:10px}#send-message input{flex:1;min-width:0}
+@media(max-width:800px){body.with-navigation{padding-left:0;padding-bottom:70px}#site-navigation{top:auto;bottom:0;left:0;width:100%;flex-direction:row;overflow-x:auto;background:#111;border-top:1px solid var(--border)}#site-navigation a{white-space:nowrap;font-size:12px;padding:16px 12px}}

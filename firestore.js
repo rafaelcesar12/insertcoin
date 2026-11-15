@@ -225,21 +225,9 @@ export async function chooseSquadGame(id, uid, compared, game) {
   });
 }
 
-export async function joinSquad(squadId, uid, nickname) {
-  const ref = doc(db, "squads", squadId);
-  const snap = await getDoc(ref);
-  if (!snap.exists()) throw new Error("Squad não encontrado");
-  const squad = snap.data();
-  if (squad.members.includes(uid)) throw new Error("Você já está neste squad");
-  if (squad.members.length >= squad.maxPlayers) throw new Error("Squad cheio");
-  await updateDoc(ref, {
-    members: arrayUnion(uid),
-    memberNicknames: arrayUnion(nickname)
-  });
-  if (squad.members.length + 1 >= squad.maxPlayers) {
-    await updateDoc(ref, { status: "cheio" });
-  }
-  await addXP(uid, 5);
+export async function joinSquad(squadId, uid, nickname, code) {
+  const {squadRequest}=await import("./squad-client.js");
+  return squadRequest("join",{id:squadId,code});
 }
 
 export async function leaveSquad(squadId, uid, nickname) {

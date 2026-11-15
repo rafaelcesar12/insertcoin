@@ -114,7 +114,7 @@
         <label for="sq-desc">Descrição</label>
         <textarea id="sq-desc" placeholder="Descreva o squad, requisitos, estilo de jogo..." maxlength="200"></textarea>
       </div>
-      <div class="error-msg" id="sq-error"></div>
+      <label><input id="sq-private" type="checkbox" style="width:auto"> Squad privado · entrada com código</label><div class="error-msg" id="sq-error"></div>
       <button class="btn btn-primary" id="btn-create-squad" style="width:100%;padding:13px;">
         <span id="sq-btn-text"> CRIAR SQUAD</span>
         <div class="spinner" id="sq-spinner" style="display:none"></div>
@@ -125,5 +125,5 @@
   <div id="toast-container"></div>
   <script type="module" src="squads.js"></script>
 <script type="module" src="branding.js"></script>
-</body>
+<script type="module" src="navigation.js"></script></body>
 </html>

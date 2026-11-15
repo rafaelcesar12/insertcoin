@@ -1,3 +1,4 @@
+import {enterSquad} from "./squad-client.js";
 // =============================================
 // INSERT COIN — Home Logic v2
 // =============================================
@@ -316,8 +317,8 @@ async function loadSquadsWidget() {
     const squads = await getOpenSquads(5);
     if (!squads.length) { widget.innerHTML = `<div style="color:var(--text-muted);font-size:12px;">Nenhum squad aberto.</div>`; return; }
     widget.innerHTML = squads.map(s => `
-      <div class="squad-card">
-        <div class="squad-name"> ${escHtml(s.name)}</div>
+      <div class="squad-card" data-squad-id="${s.id}" tabindex="0" role="button" aria-label="Abrir squad">
+        <div class="squad-name"> ${escHtml(s.name)}${s.isPrivate ? " · Privado" : ""}</div>
         <div class="squad-meta">
           <span>${escHtml(s.game)} · ${escHtml(s.platform)}</span>
           <span>${s.members?.length || 1}/${s.maxPlayers} vagas</span>
@@ -326,16 +327,10 @@ async function loadSquadsWidget() {
           <button class="squad-join-btn" data-id="${s.id}" data-name="${escHtml(s.name)}">Entrar</button>
         </div>
       </div>`).join("");
-    widget.querySelectorAll(".squad-join-btn").forEach(btn => {
-      btn.addEventListener("click", async (e) => {
-        const id   = e.currentTarget.dataset.id;
-        const name = e.currentTarget.dataset.name;
-        try {
-          await joinSquad(id, currentUser.uid, userProfile?.nickname || "?");
-          showToast(`Você entrou no squad ${name}! +5 XP `);
-          await loadSquadsWidget();
-        } catch (err) { showToast(err.message, "error"); }
-      });
+    widget.querySelectorAll("[data-squad-id]").forEach(card=>{
+      const open=async()=>{try{await enterSquad(card.dataset.squadId);}catch(e){showToast(e.message,"error");}};
+      card.onclick=open;
+      card.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();open();}};
     });
   } catch {
     widget.innerHTML = `<div style="color:var(--text-muted);font-size:12px;">Erro ao carregar squads.</div>`;
